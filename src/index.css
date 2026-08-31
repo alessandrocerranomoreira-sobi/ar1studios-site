@@ -1,4 +1,13 @@
+/* Direção visual: editorial audiovisual premium, multissetorial e orientada à conversão. Foco visível e leitura sem dependência de movimento. */
+
 html, body, #root { min-height: 100%; }
 body { overflow-x: hidden; }
 ::selection { background: #b86b45; color: #111315; }
 :focus-visible { outline: 2px solid #b86b45; outline-offset: 4px; }
+section[id], main[id] { scroll-margin-top: 90px; }
+.field, input, select { min-width: 0; }
+.skip-link { position: absolute; top: 8px; left: 12px; padding: 12px 18px; color: #111315; background: #f2efe8; transform: translateY(-150%); z-index: 30; }
+.skip-link:focus { transform: translateY(0); }
+.not-found { min-height: 80dvh; padding-top: 150px; }
+.not-found h1 { font-size: clamp(40px, 6vw, 72px); }
+.not-found p { max-width: 48ch; }
