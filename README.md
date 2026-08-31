@@ -51,4 +51,8 @@ O arquivo `vercel.json` mantém as rotas `/leilao-360` e `/filme-de-legado` func
 
 ## Supabase
 
-Não foi usado nesta versão. O site é estático e não precisa de banco. Se futuramente você quiser guardar leads em um painel, o formulário pode ser conectado ao Supabase sem alterar o design.
+A base Supabase foi criada em 31/08/2026, com tabelas, RLS e bucket privado. O site publicado continua estático e ainda não está conectado ao banco: o formulário não salva solicitações e login/painel não foram implementados. Consulte `supabase/README.md` para o estado da base.
+
+## Continuidade por outra IA ou desenvolvedor
+
+Leia [o manual técnico de continuidade](DOCUMENTACAO_CONTINUIDADE_IA_AR1_STUDIOS.md). Ele reúne caminhos locais, URLs, versões, arquivos editáveis, modelos de páginas e dados, publicação, segurança e pendências. O pacote de continuidade contém também os arquivos Supabase locais ainda não enviados à main remota nesta revisão.
