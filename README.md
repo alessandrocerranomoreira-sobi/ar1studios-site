@@ -1,5 +1,7 @@
 # AR1 Studios
 
+> Pasta de trabalho consolidada em 31/08/2026: consulte [LOCAL_DE_TRABALHO.md](LOCAL_DE_TRABALHO.md) para a localização atual, o histórico preservado e as referências documentais.
+
 Site institucional de alta conversão da AR1 Studios, pronto para Vercel.
 
 ## Como editar
