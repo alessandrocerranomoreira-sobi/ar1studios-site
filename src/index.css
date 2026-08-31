@@ -1,0 +1,4 @@
+html, body, #root { min-height: 100%; }
+body { overflow-x: hidden; }
+::selection { background: #b86b45; color: #111315; }
+:focus-visible { outline: 2px solid #b86b45; outline-offset: 4px; }
