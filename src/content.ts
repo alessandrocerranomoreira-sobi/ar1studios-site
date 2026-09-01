@@ -61,7 +61,7 @@ export const flagshipOffers = [
     title: "Filme de Legado",
     body: "Pesquisa, roteiro e produção para histórias que precisam permanecer com valor e clareza.",
     href: "/filme-de-legado",
-    image: "/media/horse.webp",
+    image: "/media/cattle-wide.webp",
   },
 ] as const;
 

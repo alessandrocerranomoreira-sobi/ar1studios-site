@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
-import "@fontsource/manrope/400.css";
-import "@fontsource/manrope/500.css";
-import "@fontsource/manrope/600.css";
-import "@fontsource/manrope/700.css";
-import "@fontsource/manrope/800.css";
+import "@fontsource/manrope/latin-400.css";
+import "@fontsource/manrope/latin-600.css";
+import "@fontsource/manrope/latin-700.css";
+import "@fontsource/manrope/latin-800.css";
 import "./App.css";
 import {
   faq,
@@ -35,8 +34,20 @@ const initialLead: LeadForm = { name: "", role: "", phone: "", email: "", compan
 function usePageMeta(title: string, description: string) {
   useEffect(() => {
     document.title = title;
-    const meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    if (meta) meta.content = description;
+    const path = window.location.pathname.replace(/\/+$/, "") || "/";
+    const canonicalUrl = `https://${siteConfig.domain}${path === "/" ? "/" : path}`;
+    const setMeta = (selector: string, content: string) => {
+      const meta = document.querySelector<HTMLMetaElement>(selector);
+      if (meta) meta.content = content;
+    };
+    setMeta('meta[name="description"]', description);
+    setMeta('meta[property="og:title"]', title);
+    setMeta('meta[property="og:description"]', description);
+    setMeta('meta[property="og:url"]', canonicalUrl);
+    setMeta('meta[name="twitter:title"]', title);
+    setMeta('meta[name="twitter:description"]', description);
+    const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (canonical) canonical.href = canonicalUrl;
   }, [title, description]);
 }
 
@@ -46,23 +57,40 @@ function Logo({ compact = false }: { compact?: boolean }) {
 
 function Header() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const path = window.location.pathname.replace(/\/+$/, "") || "/";
 
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => event.key === "Escape" && setOpen(false);
+    const updateHeader = () => setScrolled(window.scrollY > 24);
     window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
+    window.addEventListener("scroll", updateHeader, { passive: true });
+    updateHeader();
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("scroll", updateHeader);
+    };
   }, []);
 
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    if (open) document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [open]);
+
+  const current = (href: string) => path === href ? "page" as const : undefined;
+
   return (
-    <header className="site-header">
+    <header className={`site-header ${scrolled ? "scrolled" : ""}`}>
       <a className="skip-link" href="#conteudo">Pular para o conteúdo</a>
       <a className="brand-link" href="/" aria-label="AR1 Studios, início"><Logo /></a>
-      <button className="menu-button" onClick={() => setOpen(!open)} aria-controls="main-navigation" aria-expanded={open} aria-label={open ? "Fechar menu" : "Abrir menu"}><span /><span /></button>
+      <button className="menu-button" onClick={() => setOpen(!open)} aria-controls="main-navigation" aria-expanded={open} aria-label={open ? "Fechar menu" : "Abrir menu"}><span aria-hidden="true" /><span aria-hidden="true" /></button>
+      {open && <button className="menu-backdrop" type="button" aria-label="Fechar menu" onClick={() => setOpen(false)} />}
       <nav id="main-navigation" className={open ? "nav open" : "nav"} aria-label="Navegação principal">
-        <a href="/solucoes" onClick={() => setOpen(false)}>Soluções</a>
-        <a href="/haras-sobi" onClick={() => setOpen(false)}>Haras SOBI</a>
-        <a href="/metodo" onClick={() => setOpen(false)}>Método</a>
-        <a href="/sobre" onClick={() => setOpen(false)}>Sobre</a>
+        <a href="/solucoes" aria-current={current("/solucoes")} onClick={() => setOpen(false)}>Soluções</a>
+        <a href="/haras-sobi" aria-current={current("/haras-sobi")} onClick={() => setOpen(false)}>Haras SOBI</a>
+        <a href="/metodo" aria-current={current("/metodo")} onClick={() => setOpen(false)}>Método</a>
+        <a href="/sobre" aria-current={current("/sobre")} onClick={() => setOpen(false)}>Sobre</a>
         <a href="/#contato" className="nav-cta" onClick={() => setOpen(false)}>Solicitar proposta</a>
       </nav>
     </header>
@@ -122,17 +150,19 @@ function ContactForm({ defaultProject = "" }: { defaultProject?: string }) {
   }
 
   return (
-    <form className="lead-form" onSubmit={submit}>
-      <div className="field"><label htmlFor="name">Nome</label><input id="name" autoComplete="name" required value={lead.name} onChange={(event) => update("name", event.target.value)} /></div>
-      <div className="field"><label htmlFor="role">Cargo ou função</label><input id="role" autoComplete="organization-title" value={lead.role} onChange={(event) => update("role", event.target.value)} /></div>
-      <div className="field"><label htmlFor="phone">WhatsApp</label><input id="phone" type="tel" autoComplete="tel" required value={lead.phone} onChange={(event) => update("phone", event.target.value)} /></div>
-      <div className="field"><label htmlFor="email">E-mail</label><input id="email" type="email" autoComplete="email" value={lead.email} onChange={(event) => update("email", event.target.value)} /></div>
-      <div className="field"><label htmlFor="company">Empresa, organização ou projeto</label><input id="company" autoComplete="organization" required value={lead.company} onChange={(event) => update("company", event.target.value)} /></div>
-      <div className="field"><label htmlFor="project">Principal interesse</label><select id="project" required value={lead.project} onChange={(event) => update("project", event.target.value)}><option value="">Selecione</option>{projectOptions.map((project) => <option key={project} value={project}>{project}</option>)}</select></div>
-      <div className="field full"><label htmlFor="brief">O que precisa acontecer?</label><textarea id="brief" rows={4} value={lead.brief} onChange={(event) => update("brief", event.target.value)} placeholder="Conte o objetivo, o público e a necessidade principal." /></div>
+    <form className="lead-form" onSubmit={submit} aria-label="Solicitação de proposta" aria-describedby="form-status form-privacy">
+      <p className="form-heading full"><span>Briefing inicial</span><strong>Conte o essencial. A AR1 organiza o próximo passo.</strong></p>
+      <div className="field"><label htmlFor="name">Nome <span>obrigatório</span></label><input id="name" autoComplete="name" maxLength={80} required value={lead.name} onChange={(event) => update("name", event.target.value)} /></div>
+      <div className="field"><label htmlFor="role">Cargo ou função</label><input id="role" autoComplete="organization-title" maxLength={100} value={lead.role} onChange={(event) => update("role", event.target.value)} /></div>
+      <div className="field"><label htmlFor="phone">WhatsApp <span>obrigatório</span></label><input id="phone" type="tel" inputMode="tel" autoComplete="tel" maxLength={24} placeholder="(00) 00000-0000" required value={lead.phone} onChange={(event) => update("phone", event.target.value)} /></div>
+      <div className="field"><label htmlFor="email">E-mail</label><input id="email" type="email" inputMode="email" autoComplete="email" maxLength={160} placeholder="voce@empresa.com.br" value={lead.email} onChange={(event) => update("email", event.target.value)} /></div>
+      <div className="field"><label htmlFor="company">Empresa, organização ou projeto <span>obrigatório</span></label><input id="company" autoComplete="organization" maxLength={160} required value={lead.company} onChange={(event) => update("company", event.target.value)} /></div>
+      <div className="field"><label htmlFor="project">Principal interesse <span>obrigatório</span></label><select id="project" required value={lead.project} onChange={(event) => update("project", event.target.value)}><option value="">Selecione</option>{projectOptions.map((project) => <option key={project} value={project}>{project}</option>)}</select></div>
+      <div className="field full"><label htmlFor="brief">O que precisa acontecer?</label><textarea id="brief" rows={4} maxLength={1000} value={lead.brief} onChange={(event) => update("brief", event.target.value)} placeholder="Conte o objetivo, o público e a necessidade principal." /></div>
       <div className="field full"><label htmlFor="date">Data prevista, se houver</label><input id="date" type="date" value={lead.date} onChange={(event) => update("date", event.target.value)} /></div>
       <button className="button primary full" type="submit">Solicitar proposta</button>
-      <p className="form-note full" aria-live="polite">{status || "A AR1 avalia aderência, estrutura e próximos passos antes de apresentar a proposta."}</p>
+      <p id="form-status" className="form-note full" role="status" aria-live="polite">{status || "A AR1 avalia aderência, estrutura e próximos passos antes de apresentar a proposta."}</p>
+      <p id="form-privacy" className="form-privacy full">Ao solicitar contato, você autoriza a AR1 a responder pelos dados informados. Nenhum dado é salvo no site nesta versão.</p>
     </form>
   );
 }
@@ -142,7 +172,7 @@ function ContactSection({ defaultProject = "", title = "Vamos colocar seu próxi
     <section id="contato" className="contact section-dark">
       <div className="contact-visual"><img src="/media/glow-horizontal.webp" alt="Luz no horizonte" loading="lazy" /><div className="image-overlay" /></div>
       <div className="contact-layout page-shell">
-        <Reveal className="contact-copy"><p className="eyebrow">Próximo passo</p><h2>{title}</h2><p>Conte o que precisa acontecer. A conversa começa pela aderência, não por uma tabela pronta.</p></Reveal>
+        <Reveal className="contact-copy"><p className="eyebrow">Próximo passo</p><h2>{title}</h2><p>Conte o que precisa acontecer. A conversa começa pela aderência, não por uma tabela pronta.</p><ul className="contact-points"><li><span>01</span>Resposta humana e contextual</li><li><span>02</span>Escopo antes do orçamento</li><li><span>03</span>Agenda e viabilidade confirmadas</li></ul></Reveal>
         <ContactForm defaultProject={defaultProject} />
       </div>
     </section>
@@ -192,7 +222,7 @@ function Home() {
   return (
     <><Header /><main id="conteudo">
       <section className="home-hero">
-        <img src="/media/hero-fields.webp" alt="Paisagem ampla de produção" fetchPriority="high" />
+        <img src="/media/event-stage.webp" alt="Estrutura de palco e produção audiovisual" fetchPriority="high" />
         <div className="image-overlay" />
         <div className="home-hero-copy page-shell"><p className="eyebrow">Capacidade de mídia · produção · locação</p><h1>Conhecimento, estrutura e histórias <span>colocados em operação.</span></h1><p>A AR1 organiza conteúdo, estúdios, transmissões e produções especiais — com o Haras SOBI como uma de suas principais plataformas de criação.</p><div className="hero-actions"><a className="button primary" href="#contato">Solicitar proposta</a><a className="button ghost" href="/solucoes">Conhecer soluções</a></div></div>
         <a className="hero-haras-link" href="/haras-sobi"><span>Oferta principal</span><strong>Conheça o Haras SOBI</strong><b>+20 cenários · até 4 mil pessoas</b></a>
@@ -208,7 +238,7 @@ function Home() {
 
       <section className="solutions-overview section-light"><div className="page-shell"><Reveal className="section-heading compact"><div><p className="eyebrow">Como a AR1 atua</p><h2>Três famílias. Uma operação conectada.</h2></div><p>Da recorrência editorial à construção de estúdios e aos projetos de grande escala.</p></Reveal><FamilyCards /><a className="text-link" href="/solucoes">Ver todas as soluções</a></div></section>
 
-      <section className="flagships section-dark"><div className="page-shell"><Reveal><p className="eyebrow">Ofertas de assinatura</p><h2>Estruturas reconhecíveis para desafios específicos.</h2></Reveal><FlagshipGrid /></div></section>
+      <section className="flagships section-dark"><div className="page-shell"><Reveal><p className="eyebrow">Ofertas principais</p><h2>Estruturas reconhecíveis para desafios específicos.</h2></Reveal><FlagshipGrid /></div></section>
 
       <section className="method-preview section-light"><div className="page-shell split"><Reveal><p className="eyebrow">Método AR1</p><h2>Clareza antes da câmera.</h2><p className="section-intro dark">Cada projeto começa pela decisão, pelo público e pelo uso. Equipamento, equipe e formato entram depois.</p><a className="text-link" href="/metodo">Conhecer o método</a></Reveal><div className="method-list">{methodSteps.map((step) => <Reveal className="method-row" key={step.number}><span>{step.number}</span><div><h3>{step.title}</h3><p>{step.body}</p></div></Reveal>)}</div></div></section>
 
@@ -245,7 +275,16 @@ function HarasPage() {
     ["/media/event-stage.webp", "Shows, eventos e grandes montagens"],
     ["/media/mist-fields.webp", "Atmosferas para filmes e campanhas"],
   ];
-  return <><Header /><main id="conteudo"><PageHero eyebrow="Haras SOBI · oferta principal AR1" title="Um território inteiro para colocar grandes ideias em cena." summary="Um dos maiores espaços de produção de conteúdo do Brasil, com mais de 20 cenários, pista de laço para shows e DVDs e área coberta para até 4 mil pessoas." image="/media/hero-fields.webp" cta="Consultar agenda e proposta" /><section className="haras-numbers section-light"><div className="page-shell"><Reveal><p className="eyebrow">Escala real</p><h2>Mais possibilidades. Menos deslocamentos.</h2></Reveal><div className="fact-grid light">{harasFacts.map((fact) => <Reveal className="fact-card" key={fact.value}><strong>{fact.value}</strong><span>{fact.label}</span></Reveal>)}</div></div></section><section className="haras-gallery-section section-dark"><div className="page-shell"><Reveal className="section-heading compact"><div><p className="eyebrow">Uma locação, muitas linguagens</p><h2>Do íntimo ao monumental.</h2></div><p>O desenho do projeto define áreas, circulação, montagem, equipe, captação e operação. A disponibilidade é confirmada conforme agenda e avaliação técnica.</p></Reveal><div className="venue-gallery">{gallery.map(([image, label], index) => <Reveal className={`venue-shot shot-${index + 1}`} key={label}><img src={image} alt={label} loading="lazy" /><span>{String(index + 1).padStart(2, "0")} · {label}</span></Reveal>)}</div></div></section><section className="applications-section section-light"><div className="page-shell"><Reveal><p className="eyebrow">O que pode acontecer aqui</p><h2>Uma plataforma para produção, evento e experiência.</h2></Reveal><div className="application-grid">{harasApplications.map(([title, body], index) => <Reveal className="application-card" key={title}><span>{String(index + 1).padStart(2, "0")}</span><h3>{title}</h3><p>{body}</p></Reveal>)}</div></div></section><section className="haras-operation section-dark"><div className="page-shell split"><Reveal><p className="eyebrow">Modelo de contratação</p><h2>Locação e produção podem ser pensadas juntas.</h2></Reveal><Reveal className="large-copy"><p>A proposta é construída conforme formato, público, data, áreas utilizadas, montagem, equipe, operação audiovisual e responsabilidades. Cada projeto passa por briefing e avaliação de viabilidade.</p><strong>O espaço abre possibilidades. O planejamento transforma possibilidade em execução.</strong></Reveal></div></section><ContactSection defaultProject="Haras SOBI" title="Vamos desenhar sua produção no Haras SOBI." /></main><Footer /></>;
+  return (
+    <><Header /><main id="conteudo">
+      <PageHero eyebrow="Haras SOBI · oferta principal AR1" title="Um território inteiro para colocar grandes ideias em cena." summary="Um dos maiores espaços de produção de conteúdo do Brasil, com mais de 20 cenários, pista de laço para shows e DVDs e área coberta para até 4 mil pessoas." image="/media/horse.webp" cta="Consultar agenda e proposta" />
+      <section className="haras-numbers section-light"><div className="page-shell"><Reveal><p className="eyebrow">Escala real</p><h2>Mais possibilidades. Menos deslocamentos.</h2></Reveal><div className="fact-grid light">{harasFacts.map((fact) => <Reveal className="fact-card" key={fact.value}><strong>{fact.value}</strong><span>{fact.label}</span></Reveal>)}</div></div></section>
+      <section className="haras-gallery-section section-dark"><div className="page-shell"><Reveal className="section-heading compact"><div><p className="eyebrow">Uma locação, muitas linguagens</p><h2>Do íntimo ao monumental.</h2></div><p>O desenho do projeto define áreas, circulação, montagem, equipe, captação e operação. A disponibilidade é confirmada conforme agenda e avaliação técnica.</p></Reveal><div className="venue-gallery">{gallery.map(([image, label], index) => <Reveal className={`venue-shot shot-${index + 1}`} key={label}><img src={image} alt={label} loading="lazy" /><span>{String(index + 1).padStart(2, "0")} · {label}</span></Reveal>)}</div></div></section>
+      <section className="applications-section section-light"><div className="page-shell"><Reveal><p className="eyebrow">O que pode acontecer aqui</p><h2>Uma plataforma para produção, evento e experiência.</h2></Reveal><div className="application-grid">{harasApplications.map(([title, body], index) => <Reveal className="application-card" key={title}><span>{String(index + 1).padStart(2, "0")}</span><h3>{title}</h3><p>{body}</p></Reveal>)}</div></div></section>
+      <section className="haras-operation section-dark"><div className="page-shell split"><Reveal><p className="eyebrow">Modelo de contratação</p><h2>Locação e produção podem ser pensadas juntas.</h2></Reveal><Reveal className="large-copy"><p>A proposta é construída conforme formato, público, data, áreas utilizadas, montagem, equipe, operação audiovisual e responsabilidades. Cada projeto passa por briefing e avaliação de viabilidade.</p><strong>O espaço abre possibilidades. O planejamento transforma possibilidade em execução.</strong></Reveal></div></section>
+      <ContactSection defaultProject="Haras SOBI" title="Vamos desenhar sua produção no Haras SOBI." />
+    </main><Footer /></>
+  );
 }
 
 function ProductPage({ type }: { type: "live" | "legacy" }) {
@@ -294,8 +333,18 @@ function NotFound() {
 function App() {
   const path = window.location.pathname.replace(/\/+$/, "") || "/";
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add("visible")), { threshold: 0.1 });
-    document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+    const elements = document.querySelectorAll(".reveal");
+    if (!("IntersectionObserver" in window)) {
+      elements.forEach((element) => element.classList.add("visible"));
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      }
+    }), { threshold: 0.08, rootMargin: "0px 0px -24px" });
+    elements.forEach((element) => observer.observe(element));
     return () => observer.disconnect();
   }, [path]);
 
