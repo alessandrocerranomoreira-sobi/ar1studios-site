@@ -1,7 +1,7 @@
 # Auditoria ponta a ponta de UI e UX — AR1 Studios
 
 **Data:** 1º de setembro de 2026  
-**Escopo:** versão local da branch `feat/integracao-manus-2026-08-31`  
+**Escopo:** versão atualizada e publicada pela branch `main`; referência de código `08e4af5`
 **Objetivo:** verificar funcionamento, acessibilidade, responsividade, clareza comercial e qualidade visual; corrigir os problemas encontrados.
 
 ## Resultado executivo
@@ -84,11 +84,11 @@ Estas pendências não podem ser resolvidas sem dados ou autorização adicional
 1. confirmar o número oficial de WhatsApp;
 2. confirmar que `contato@ar1studios.com.br` existe e recebe mensagens;
 3. fornecer URLs oficiais das redes sociais;
-4. substituir imagens conceituais por fotografias próprias e autorizadas do Haras e dos projetos;
+4. fornecer fotografias próprias e autorizadas para demais projetos; o Haras já utiliza seleção de fotografias reais fornecidas;
 5. decidir sobre CRM ou armazenamento de leads; hoje o site apenas prepara o contato externo;
-6. autorizar uma publicação para que a versão auditada seja validada também no ambiente de produção;
+6. revalidar domínio e rotas públicas após qualquer ajuste de DNS ou nova publicação;
 7. a página de endereço inexistente é apresentada no cliente, mas o rewrite da SPA pode continuar respondendo HTTP 200 no servidor estático.
 
 ## Critério de conclusão desta auditoria
 
-A implementação local está aprovada quando build e lint passam, as rotas são revalidadas em desktop e celular, o formulário mantém destino configurado e as alterações estão versionadas. A publicação permanece uma etapa separada e depende de autorização expressa.
+A implementação foi versionada e enviada à `main`. Em cada manutenção futura, build e lint devem passar, as rotas precisam ser revalidadas em desktop e celular e o formulário deve manter destino configurado. A publicação continua dependente da autorização de cada alteração e a validação do domínio depende do DNS.

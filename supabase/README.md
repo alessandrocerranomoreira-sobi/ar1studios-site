@@ -3,6 +3,8 @@
 Projeto: `pykbaqlwrkamxtrmsswm` (São Paulo).
 Dashboard: https://supabase.com/dashboard/project/pykbaqlwrkamxtrmsswm
 
+> Estado em 01/09/2026: esta é uma fundação de backend separada. O site atual continua estático; não envia briefing ao banco, não autentica usuários e não deve receber segredos no navegador. Para a interface e publicação atuais, consulte `docs/ESTADO_ATUAL_SITE_AR1_STUDIOS_2026-09-01.md`.
+
 ## Escopo da etapa — 31/08/2026
 
 Base de dados e permissões para futura integração. Esta etapa não altera o site publicado e não faz o formulário salvar solicitações.

@@ -1,5 +1,7 @@
 # Implementação da nova estratégia do site e Haras SOBI
 
+> **Registro histórico de implementação (31/08/2026).** Para o estado atual, incluindo as fotografias reais, a jornada de consultoria, o hero da fachada e a publicação, consulte [ESTADO_ATUAL_SITE_AR1_STUDIOS_2026-09-01.md](ESTADO_ATUAL_SITE_AR1_STUDIOS_2026-09-01.md).
+
 **Data:** 31 de agosto de 2026  
 **Branch:** `feat/integracao-manus-2026-08-31`
 

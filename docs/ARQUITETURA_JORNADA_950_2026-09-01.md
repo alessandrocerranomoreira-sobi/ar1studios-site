@@ -1,6 +1,6 @@
 # Arquitetura de jornada AR1 Studios — ciclo 950
 
-Data da implementação: 1º de setembro de 2026.
+Data da implementação: 1º de setembro de 2026. A referência desta entrega é o commit `08e4af5`, enviado para a branch `main` e publicado pela integração GitHub → Vercel. Domínio próprio, contatos e ferramentas externas continuam sujeitos a confirmação.
 
 ## Objetivo
 
@@ -17,7 +17,7 @@ Transformar o site em uma jornada comercial orientada por necessidade, mantendo 
 - redirecionamento da página antiga de consultoria para `/consultoria-podcast`;
 - eventos de mensuração preparados em `dataLayer`, sem envio de dados pessoais;
 - preservação de origem UTM no briefing aberto por e-mail ou WhatsApp;
-- metadados, URL canônica e JSON-LD específicos gerados no build para 13 rotas;
+- metadados, URL canônica e JSON-LD específicos gerados no build para 13 rotas internas, além da Home;
 - sitemap ampliado com as capacidades agora encontráveis;
 - dois mapas de treinamento: visão executiva e mapa detalhado de cliques.
 
@@ -35,7 +35,7 @@ Transformar o site em uma jornada comercial orientada por necessidade, mantendo 
 
 - a fachada fornecida foi convertida para WebP em uma versão de 1600 px e outra vertical para celular;
 - ela agora é a imagem principal da Home, para apresentar a marca e seu território já no primeiro contato;
-- a hero preserva contraste para leitura e usa o enquadramento vertical correto em telas menores.
+- a hero preserva contraste para leitura, usa o enquadramento vertical correto em telas menores e desloca a fachada no desktop para manter a marca da fachada fora da área de texto.
 
 ## Eventos preparados
 

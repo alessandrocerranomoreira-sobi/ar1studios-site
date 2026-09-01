@@ -1,5 +1,7 @@
 # AR1 Studios — Manual técnico de continuidade para qualquer IA
-Versão 1.2 · 31/08/2026 · Referência de verificação: 11h10, America/Sao_Paulo.
+Versão 1.3 · atualização operacional em 01/09/2026, America/Sao_Paulo.
+
+> **Leitura obrigatória para o estado atual:** consulte primeiro [docs/ESTADO_ATUAL_SITE_AR1_STUDIOS_2026-09-01.md](docs/ESTADO_ATUAL_SITE_AR1_STUDIOS_2026-09-01.md). As seções históricas deste manual registram a verificação de 31/08/2026; onde houver divergência sobre interface, Git, rotas, imagens, publicação ou pendências, o documento de estado atual prevalece.
 
 ## 1. Leia isto primeiro
 
@@ -13,14 +15,14 @@ O pacote de continuidade inclui código-fonte, imagens, dependências declaradas
 
 | Item | Situação |
 | --- | --- |
-| Site Vercel | As três rotas principais responderam HTTP 200 |
-| Código publicado em main | Commit 98eb28a7bb38b738f9533ced1e0a41b64ca04701 |
+| Site Vercel | Publicação pela integração GitHub → Vercel foi observada após a atualização da main; revalidar URL e DNS antes de chamar um domínio de ativo |
+| Código publicado em main | Referência da versão atual: commit `08e4af5` |
 | Base Supabase | Criada no projeto indicado; migração aplicada |
 | Código local da base | Commit f6b6dd7, branch feat/supabase-base |
-| GitHub | Consulta remota mostrou apenas main; a branch Supabase ainda não foi enviada |
+| GitHub | `main` contém as atualizações de interface, jornada, imagens do Haras e documentação atual; revalidar branches remotas antes de qualquer integração de Supabase |
 | Formulário | Abre WhatsApp ou aplicativo de e-mail; não salva no banco |
 | Login / painel / portal | Ainda não implementados |
-| Domínio próprio e www | Falha de resolução nesta verificação; não considerar ativos |
+| Domínio próprio e www | `ar1studios.com.br` é o domínio pretendido; resolução e configuração devem ser confirmadas externamente antes de divulgação |
 | Qualidade local | npm run lint e npm run build concluídos com sucesso |
 | Alterações desta documentação | Documentais; não alteram a interface nem publicam novo deploy |
 
@@ -53,10 +55,10 @@ Os endereços dos painéis exigem acesso autorizado. Possuir uma URL não signif
 ### Cópia de trabalho mais completa nesta máquina
 
 ~~~text
-C:\Users\aless\.codex\visualizations\2026\08\30\01a053aa-5897-7ad3-85b4-5a5e79c240e0\ar1studios-site-publicacao
+E:\CLIENTES 2026\AR1 STUDIOS OFICIAL 2026\01_SITE_ATUAL\ar1studios-site
 ~~~
 
-Esta pasta contém o Git local, o site e a base Supabase. O caminho dentro de visualizations é apenas uma localização nesta máquina: não significa que o site dependa do Codex ou de um serviço de visualizações.
+Esta pasta contém o Git local, o site e a base Supabase. É a cópia indicada para manutenção. O projeto não depende do Codex, de visualizações ou de um serviço de geração para funcionar.
 
 ### Cópia anterior do proprietário
 
@@ -77,7 +79,7 @@ Esses documentos anteriores não prevalecem sobre o código, o banco verificado 
 
 ### Em outro computador / outra IA
 
-Use o pacote AR1_STUDIOS_CONTINUIDADE_IA_2026-08-31.zip e abra a pasta extraída ar1studios-site. Os caminhos relativos deste manual passam a partir dela. Alternativamente, clone o GitHub, mas lembre-se de que main ainda não contém a base Supabase e esta documentação na data desta revisão.
+Use o pacote AR1_STUDIOS_CONTINUIDADE_IA_2026-08-31.zip somente como snapshot da base e abra a pasta extraída ar1studios-site. Os caminhos relativos deste manual passam a partir dela. Para o front-end atual, clone o GitHub e consulte o documento de estado atual; antes de integrar a fundação Supabase, compare a branch e os arquivos necessários.
 
 O ZIP é um snapshot sem .git. Para preservar o histórico, preferir clonar o repositório e comparar/aplicar os arquivos adicionais do pacote em uma branch. Nunca tratar o ZIP como autorização para sobrescrever arquivos locais.
 

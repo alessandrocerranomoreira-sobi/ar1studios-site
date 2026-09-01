@@ -1,5 +1,7 @@
 # Integração do pacote Manus — 31 de agosto de 2026
 
+> **Registro histórico de integração.** Este documento descreve somente a etapa datada. Para a arquitetura e o estado atual do site, consulte [ESTADO_ATUAL_SITE_AR1_STUDIOS_2026-09-01.md](ESTADO_ATUAL_SITE_AR1_STUDIOS_2026-09-01.md).
+
 ## Origem e preservação
 
 O código recebido em `MANUS/AR1_STUDIOS_CODIGO_ATUALIZADO.zip` foi integrado ao repositório canônico em `01_SITE_ATUAL/ar1studios-site`.

@@ -42,8 +42,8 @@ Corrigir a leitura de textos sobre fotografias em todo o site, ampliar a presen�
 
 ## Pendências externas, não inventadas
 
-- substituir imagens conceituais por fotos reais somente após confirmar origem e direito de uso;
+- substituir imagens conceituais por fotos reais somente após confirmar origem e direito de uso; a galeria e os destaques do Haras já utilizam a seleção de fotos reais fornecida;
 - publicar cases nomeados somente após autorizar cliente, papel da AR1, imagem e resultado;
 - revalidar juridicamente e operacionalmente as informações de capacidade do Haras antes de campanhas pagas;
 - confirmar número de WhatsApp, e-mail e perfis sociais oficiais;
-- publicar em produção somente mediante autorização expressa.
+- revalidar domínio, contatos e redes sociais após configuração pelo proprietário.
