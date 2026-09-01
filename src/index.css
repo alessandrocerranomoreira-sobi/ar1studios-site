@@ -3,7 +3,8 @@
 html, body, #root { min-height: 100%; }
 body { overflow-x: hidden; }
 ::selection { background: #b86b45; color: #111315; }
-:focus-visible { outline: 2px solid #b86b45; outline-offset: 4px; }
+:where(a, button, summary, input, select, textarea):focus-visible { outline: 3px solid #f2efe8; outline-offset: 3px; box-shadow: 0 0 0 6px #111315; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 section[id], main[id] { scroll-margin-top: 90px; }
 .field, input, select { min-width: 0; }
 .skip-link { position: absolute; top: 8px; left: 12px; padding: 12px 18px; color: #111315; background: #f2efe8; transform: translateY(-150%); z-index: 30; }
@@ -11,3 +12,7 @@ section[id], main[id] { scroll-margin-top: 90px; }
 .not-found { min-height: 80dvh; padding-top: 150px; }
 .not-found h1 { font-size: clamp(40px, 6vw, 72px); }
 .not-found p { max-width: 48ch; }
+
+@media (forced-colors: active) {
+  :where(a, button, summary, input, select, textarea):focus-visible { outline-color: Highlight; box-shadow: none; }
+}

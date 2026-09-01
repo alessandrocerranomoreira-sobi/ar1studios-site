@@ -65,6 +65,134 @@ export const flagshipOffers = [
   },
 ] as const;
 
+export const visualStories = [
+  {
+    label: "Produção em campo",
+    title: "Estratégia, equipe e território na mesma operação.",
+    body: "O contexto define roteiro, logística, captação e o uso posterior de cada ativo.",
+    image: "/media/producao-campo-equipe.webp",
+    alt: "Equipe audiovisual preparando uma gravação externa",
+    href: "/metodo",
+    cta: "Conhecer o método",
+  },
+  {
+    label: "Eventos e transmissões",
+    title: "O palco é apenas um momento da jornada.",
+    body: "Planejamento técnico, direção e conteúdos posteriores transformam presença em continuidade.",
+    image: "/media/evento-palco-camera.webp",
+    alt: "Palco de evento com câmeras posicionadas para transmissão",
+    href: "/leilao-360",
+    cta: "Ver Leilão 360",
+  },
+  {
+    label: "Conteúdo corporativo",
+    title: "Especialistas podem se tornar uma mídia própria.",
+    body: "Conhecimento interno ganha formato, cadência e qualidade para circular dentro e fora da organização.",
+    image: "/media/conteudo-corporativo-palco.webp",
+    alt: "Executivo apresentando conteúdo em um palco corporativo",
+    href: "/solucoes",
+    cta: "Explorar soluções",
+  },
+  {
+    label: "Consultoria de podcast",
+    title: "Um estúdio precisa nascer para operar.",
+    body: "Diagnóstico, projeto, fluxo, implantação e treinamento vêm antes da rotina de gravação.",
+    image: "/media/consultoria-pos-producao.webp",
+    alt: "Ambiente de pós-produção audiovisual com monitores de edição",
+    href: "/consultoria-podcast",
+    cta: "Conhecer a consultoria",
+  },
+  {
+    label: "Haras SOBI",
+    title: "Uma locação capaz de mudar de escala e linguagem.",
+    body: "Mais de 20 cenários, pista para shows e DVDs e espaço coberto para até 4 mil pessoas.",
+    image: "/media/horse.webp",
+    alt: "Cavalo em paisagem rural ao entardecer",
+    href: "/haras-sobi",
+    cta: "Explorar o Haras",
+  },
+  {
+    label: "Filmes de legado",
+    title: "Histórias organizadas para permanecer.",
+    body: "Pesquisa, escuta, território e imagem reunidos em uma narrativa com valor de patrimônio.",
+    image: "/media/cattle-wide.webp",
+    alt: "Rebanho em uma paisagem iluminada pelo nascer do sol",
+    href: "/filme-de-legado",
+    cta: "Conhecer a oferta",
+  },
+] as const;
+
+export const evidenceCases = [
+  {
+    status: "Capacidade informada",
+    label: "Haras SOBI",
+    title: "Escala física para projetos que não cabem em um estúdio convencional.",
+    body: "Uma plataforma de locação e produção com mais de 20 cenários, pista de laço para shows e gravações de DVD e área coberta para até 4 mil pessoas.",
+    proof: "+20 cenários · pista de laço · até 4 mil pessoas",
+    image: "/media/horse.webp",
+    alt: "Cavalo representando as possibilidades de produção no Haras SOBI",
+    href: "/haras-sobi",
+    cta: "Ver estrutura",
+  },
+  {
+    status: "Capacidade integrada",
+    label: "Eventos e transmissão",
+    title: "Uma operação pensada antes, durante e depois do evento.",
+    body: "A AR1 combina desenho técnico, direção, captação e organização de ativos posteriores conforme o objetivo e o escopo aprovado.",
+    proof: "Planejamento · operação · conteúdos derivados",
+    image: "/media/evento-palco-camera.webp",
+    alt: "Câmeras posicionadas em um evento de grande porte",
+    href: "/servicos/transmissao-ao-vivo",
+    cta: "Conhecer a capacidade",
+  },
+  {
+    status: "Método consultivo",
+    label: "Estúdios de podcast",
+    title: "Estrutura, fluxo e equipe desenhados como uma única operação.",
+    body: "A consultoria parte do uso e da viabilidade para orientar espaço, acústica, cenografia, áudio, vídeo, iluminação, equipamentos, implantação e treinamento.",
+    proof: "Diagnóstico · projeto · implantação · ativação",
+    image: "/media/consultoria-pos-producao.webp",
+    alt: "Ambiente profissional de pós-produção audiovisual",
+    href: "/consultoria-podcast",
+    cta: "Ver jornada consultiva",
+  },
+] as const;
+
+export const podcastConsulting = {
+  fits: [
+    ["Estúdio do zero", "Para organizações que precisam transformar um espaço disponível em uma estrutura coerente com objetivos, público e rotina."],
+    ["Estrutura existente", "Para quem já comprou equipamentos, mas ainda enfrenta gargalos de qualidade, integração, fluxo ou uso."],
+    ["Operação corporativa", "Para empresas e instituições que desejam ativar especialistas, entrevistas, aulas, treinamentos e conteúdo recorrente."],
+    ["Formato itinerante", "Para feiras, eventos e encontros que precisam levar a estrutura de conversa até onde o público e os convidados estão."],
+  ],
+  steps: [
+    ["01", "Diagnosticar", "Objetivo, público, formatos, frequência, equipe, espaço, infraestrutura disponível e limites do projeto."],
+    ["02", "Desenhar", "Arquitetura técnica, fluxo de gravação, cenografia, acústica, iluminação, áudio, vídeo e operação."],
+    ["03", "Especificar", "Equipamentos, softwares, conexões e prioridades organizados para comparação e decisão de compra."],
+    ["04", "Implantar e testar", "Acompanhamento da montagem, integração, configuração, testes de uso e correções antes da ativação."],
+    ["05", "Treinar e evoluir", "Orientação da equipe, documentação do fluxo e próximos ajustes conforme a operação ganha recorrência."],
+  ],
+  deliverables: [
+    "Diagnóstico de objetivo, público e formatos",
+    "Projeto técnico e orientação de acústica",
+    "Direção de cenografia, áudio, vídeo e iluminação",
+    "Lista técnica e critérios para decisão de compra",
+    "Fluxo de gravação, software e organização de arquivos",
+    "Implantação, testes, treinamento e orientação editorial",
+  ],
+  decisions: [
+    ["Comprar ou reorganizar?", "A consultoria identifica o que já pode ser aproveitado antes de recomendar novos investimentos."],
+    ["Equipe própria ou apoio externo?", "O desenho considera quem realmente vai operar, manter e publicar com consistência."],
+    ["Estúdio fixo ou itinerante?", "Uso, frequência, espaço e público determinam o modelo — não a tendência do momento."],
+  ],
+  faq: [
+    ["A AR1 vende equipamentos?", "A consultoria pode orientar especificações e critérios de compra. A proposta define separadamente responsabilidades, fornecedores e aquisições."],
+    ["É possível aproveitar equipamentos que já temos?", "Sim. O diagnóstico avalia compatibilidade, estado, limitações e aderência ao uso pretendido antes de recomendar substituições."],
+    ["A consultoria inclui treinamento?", "O escopo pode incluir testes, treinamento da equipe e documentação do fluxo operacional. A extensão é definida conforme a complexidade do projeto."],
+    ["Vocês também podem operar o estúdio?", "A operação recorrente pode ser avaliada como uma frente separada. Primeiro são definidos frequência, responsabilidades, equipe, entregas e nível de suporte."],
+  ],
+} as const;
+
 export const methodSteps = [
   { number: "01", title: "Avaliar aderência", body: "Entendemos o problema, o público, a estrutura disponível e a decisão que o projeto precisa apoiar." },
   { number: "02", title: "Desenhar a operação", body: "Definimos escopo, responsabilidades, cronograma, canais, locação e recursos necessários." },
@@ -117,6 +245,7 @@ export const projectOptions = [
   "Operação de conteúdo",
   "Diagnóstico de capacidade",
   "Projeto e ativação de estúdio",
+  "Consultoria e implantação de estúdio de podcast",
   "Haras SOBI",
   "Transmissão ao vivo",
   "Leilão 360",
