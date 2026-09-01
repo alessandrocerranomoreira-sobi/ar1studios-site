@@ -1,8 +1,10 @@
+import { EMAIL, SITE_NAME, WHATSAPP_E164 } from "./config/site";
+
 export const siteConfig = {
-  brand: "AR1 STUDIOS",
+  brand: SITE_NAME,
   domain: "ar1studios.com.br",
-  email: "contato@ar1studios.com.br",
-  whatsappNumber: "", // Preencher apenas com autorização e número comercial confirmado.
+  email: EMAIL,
+  whatsappNumber: WHATSAPP_E164,
   instagramUrl: "",
   youtubeUrl: "",
   linkedinUrl: "",
@@ -68,38 +70,38 @@ export const flagshipOffers = [
 export const intentRoutes = [
   {
     number: "01",
-    prompt: "Quero organizar uma operação de conteúdo",
-    destination: "Explorar soluções",
-    body: "Para transformar conhecimento interno em pauta, cadência, produção e ativos recorrentes.",
-    href: "/solucoes#familias",
-  },
-  {
-    number: "02",
-    prompt: "Quero montar ou reorganizar um estúdio",
-    destination: "Ver consultoria",
-    body: "Para decidir espaço, acústica, equipamentos, fluxo, implantação e treinamento antes da compra.",
-    href: "/consultoria-podcast",
-  },
-  {
-    number: "03",
-    prompt: "Quero realizar um evento ou transmissão",
-    destination: "Conhecer Leilão 360",
-    body: "Para integrar aquecimento, operação ao vivo e conteúdos posteriores em uma única jornada.",
-    href: "/leilao-360",
-  },
-  {
-    number: "04",
-    prompt: "Quero uma locação para um grande projeto",
-    destination: "Explorar o Haras SOBI",
-    body: "Para shows, DVDs, campanhas, filmes, podcasts, transmissões e experiências de grande escala.",
+    prompt: "Gravar um show, DVD, clipe ou campanha",
+    destination: "Ver o Haras SOBI",
+    body: "Mais de 20 cenários, pista de laço e área coberta para 4 mil pessoas em uma só locação.",
     href: "/haras-sobi",
   },
   {
-    number: "05",
-    prompt: "Quero preservar uma história ou patrimônio",
-    destination: "Ver Filme de Legado",
-    body: "Para reunir pesquisa, território, entrevistas e imagem em uma narrativa capaz de permanecer.",
+    number: "02",
+    prompt: "Transmitir um leilão ou evento ao vivo",
+    destination: "Conhecer o Leilão 360",
+    body: "Aquecimento, transmissão dirigida e melhores momentos, tudo em uma operação.",
+    href: "/leilao-360",
+  },
+  {
+    number: "03",
+    prompt: "Montar ou reorganizar um estúdio de podcast",
+    destination: "Ver a consultoria",
+    body: "Projetamos espaço, acústica, equipamento e rotina para o estúdio funcionar depois da inauguração.",
+    href: "/consultoria-podcast",
+  },
+  {
+    number: "04",
+    prompt: "Contar a história da empresa ou da família",
+    destination: "Ver o Filme de Legado",
+    body: "Pesquisa, entrevistas e filme para uma história que precisa durar.",
     href: "/filme-de-legado",
+  },
+  {
+    number: "05",
+    prompt: "Produzir conteúdo recorrente sem improviso",
+    destination: "Ver soluções",
+    body: "Transformamos o conhecimento da sua equipe em vídeos, podcasts e fotos com cadência.",
+    href: "/solucoes",
   },
 ] as const;
 

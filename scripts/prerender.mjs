@@ -7,13 +7,13 @@ const template = await readFile(join(root, "dist", "index.html"), "utf8");
 const origin = "https://ar1studios.com.br";
 
 const routes = [
-  ["solucoes", "Soluções | AR1 Studios", "Operação de conteúdo, implantação de estúdios, transmissões, filmes e produções especiais da AR1 Studios."],
-  ["consultoria-podcast", "Consultoria de podcast e estúdios | AR1 Studios", "Diagnóstico, projeto técnico, implantação, testes e treinamento para transformar um espaço de podcast em uma operação funcional."],
-  ["haras-sobi", "Haras SOBI | Locação e produção AR1 Studios", "Mais de 20 cenários, pista para shows e gravações de DVD e espaço coberto para até 4 mil pessoas.", "/media/haras-vista-aerea-2026-v1.webp"],
-  ["metodo", "Método | AR1 Studios", "Conheça o método da AR1 Studios para diagnosticar, desenhar, produzir e evoluir operações de mídia e projetos especiais."],
-  ["sobre", "Sobre | AR1 Studios", "A AR1 Studios conecta estratégia, produção audiovisual, transmissões, estúdios e locação para organizações e projetos especiais."],
-  ["leilao-360", "Leilão 360 | AR1 Studios", "Aquecimento, transmissão dirigida e conteúdo posterior para leilões."],
-  ["filme-de-legado", "Filme de Legado | AR1 Studios", "Pesquisa, roteiro e produção de filmes para preservar histórias de famílias, propriedades e marcas."],
+  ["solucoes", "Soluções | AR1 Studios", "Produzimos para você, montamos a estrutura para a sua equipe produzir, ou os dois."],
+  ["consultoria-podcast", "Consultoria de estúdio de podcast | Projeto, implantação e treinamento", "Do diagnóstico ao treinamento da equipe: seu estúdio nasce funcionando. AR1 Studios, Goiânia - GO."],
+  ["haras-sobi", "Haras SOBI | Locação para shows, DVDs, clipes e eventos em Goiânia", "Mais de 20 cenários, pista de laço e área coberta para 4 mil pessoas na GO-010, saída de Goiânia. Locação e produção pensadas juntas.", "/media/haras-vista-aerea-2026-v1.webp"],
+  ["metodo", "Método AR1 | Produção séria começa antes da gravação", "Entender, desenhar, produzir e melhorar. Você aprova o escopo antes de gastar."],
+  ["sobre", "Sobre a AR1 Studios | Goiânia - GO", "Nascemos no agro de Goiás e aprendemos a produzir onde não dá para errar."],
+  ["leilao-360", "Leilão 360 | Transmissão de leilão ao vivo, aquecimento e pós-evento", "Conteúdo de aquecimento, transmissão dirigida e melhores momentos em uma única operação. AR1 Studios, Goiânia - GO."],
+  ["filme-de-legado", "Filme de Legado | Documentário de memória empresarial e familiar", "Pesquisa, entrevistas e direção para preservar a história de empresas, famílias e territórios. AR1 Studios."],
   ["servicos/transmissao-ao-vivo", "Transmissão ao vivo | AR1 Studios", "Planejamento, captação, direção e operação de transmissões ao vivo."],
   ["servicos/fotografia-e-video", "Fotografia e vídeo | AR1 Studios", "Produção audiovisual integrada a objetivos de comunicação, acervo e relacionamento."],
   ["servicos/podcast-itinerante", "Podcast itinerante | AR1 Studios", "Entrevistas e conversas produzidas em empresas, feiras, eventos e locações especiais."],

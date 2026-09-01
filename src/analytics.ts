@@ -5,6 +5,7 @@ type AnalyticsPayload = Record<string, AnalyticsValue>;
 declare global {
   interface Window {
     dataLayer?: Array<Record<string, AnalyticsValue>>;
+    gtag?: (...args: unknown[]) => void;
   }
 }
 
@@ -27,5 +28,6 @@ export function trackEvent(event: string, payload: AnalyticsPayload = {}) {
   };
   window.dataLayer ??= [];
   window.dataLayer.push(entry);
+  window.gtag?.("event", event, payload);
   window.dispatchEvent(new CustomEvent("ar1:analytics", { detail: entry }));
 }

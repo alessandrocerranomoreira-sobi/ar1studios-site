@@ -73,6 +73,12 @@ h3 { letter-spacing: -.035em; }
 .text-link:hover::after { transform: translateX(4px); }
 .section-dark .text-link { color: var(--copper-light); }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.hero-proof { max-width: 70ch; margin: 18px 0 0; color: var(--mist); font-size: 11px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.showreel { display: block; width: 100%; min-height: 480px; margin-top: 54px; background: var(--black); object-fit: cover; }
+.form-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.contact-whatsapp { width: 100%; margin-top: 26px; }
+.header-whatsapp { display: none; }
+.whatsapp-float { position: fixed; right: 24px; bottom: 24px; z-index: 40; display: inline-flex; align-items: center; min-height: 52px; padding: 0 20px; color: var(--black); background: var(--copper); box-shadow: 0 12px 28px rgb(var(--scrim-rgb) / .32); font-size: 12px; font-weight: 800; }
 .image-overlay { position: absolute; inset: 0; background: linear-gradient(90deg, rgb(var(--scrim-rgb) / .97) 0%, rgb(var(--scrim-rgb) / .9) 52%, rgb(var(--scrim-rgb) / .48) 100%), linear-gradient(0deg, rgb(var(--scrim-rgb) / .92) 0%, rgb(var(--scrim-rgb) / .38) 62%, rgb(var(--scrim-rgb) / .2) 100%); }
 
 .home-hero { position: relative; min-height: 100dvh; display: grid; align-items: center; overflow: hidden; }
@@ -375,6 +381,8 @@ select option { background: var(--black); }
 .footer { display: grid; grid-template-columns: 1.3fr .7fr .8fr; gap: 60px; padding: 70px max(32px, calc((100vw - 1380px) / 2)) 34px; color: var(--bone); border-top: 1px solid var(--line-light); background: #0c0e0f; }
 .footer-brand p { max-width: 40ch; margin-top: 22px; color: var(--mist); font-size: 13px; line-height: 1.6; }
 .footer-nav, .footer-contact { display: grid; align-content: start; gap: 13px; font-size: 12px; }
+.footer-nav span { color: var(--copper); font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.footer-nav p { margin: 0; color: var(--mist); line-height: 1.6; }
 .footer-contact span { margin-bottom: 4px; color: var(--copper); font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 .footer small { grid-column: 1 / -1; padding-top: 26px; color: #8f9694; border-top: 1px solid var(--line-light); font-size: 12px; }
 
@@ -413,6 +421,9 @@ select option { background: var(--black); }
   .nav a:not(.nav-cta)::before { counter-increment: mobile-nav; content: "0" counter(mobile-nav); color: var(--copper-light); font-size: 10px; font-weight: 800; letter-spacing: .08em; }
   .nav a[aria-current="page"]::after { display: none; }
   .nav-cta { margin-top: auto; min-height: 58px; display: flex; align-items: center; justify-content: center; padding-inline: 16px !important; color: var(--black); background: var(--copper); }
+  .header-whatsapp { display: flex; align-items: center; justify-content: center; min-height: 52px; margin-top: 12px; color: var(--bone); border: 1px solid var(--line-light); font-size: 13px; font-weight: 800; }
+  .whatsapp-float { right: 16px; bottom: 16px; min-height: 48px; }
+  .contact { padding-bottom: 112px; }
   .home-hero .image-overlay, .page-hero .image-overlay { background: linear-gradient(to bottom, rgb(var(--scrim-rgb) / .92) 0%, rgb(var(--scrim-rgb) / .89) 58%, rgb(var(--scrim-rgb) / .98) 100%); }
   .section-light, .page-section, .section-dark { padding-block: 78px; }
   h1 { font-size: clamp(46px, 12vw, 72px); }
@@ -466,6 +477,7 @@ select option { background: var(--black); }
   .venue-shot.shot-8 { min-height: 420px; }
   .value-grid { grid-template-columns: 1fr; }
   .lead-form { grid-template-columns: 1fr; }
+  .form-actions { grid-template-columns: 1fr; }
   .field, .field.full, .button.full, .form-note.full, .form-heading.full, .form-privacy.full { grid-column: 1; }
   .footer { grid-template-columns: 1fr 1fr; padding-inline: 20px; }
   .footer-brand { grid-column: 1 / -1; }
@@ -486,6 +498,7 @@ select option { background: var(--black); }
   .family-card > img { height: 250px; }
   .flagship-card a { min-height: 430px; }
   .visual-carousel-stage { min-height: 680px; }
+  .showreel { min-height: 300px; margin-top: 36px; }
   .visual-carousel-copy { padding-inline: 20px; }
   .visual-carousel-copy h3 { font-size: 40px; }
   .visual-carousel-controls { left: 20px; }
