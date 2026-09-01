@@ -7,6 +7,7 @@ const template = await readFile(join(root, "dist", "index.html"), "utf8");
 const origin = "https://ar1studios.com.br";
 
 const routes = [
+  ["podcast", "Gravação de podcast e transmissão ao vivo | AR1 Studios · Goiânia e todo o Brasil", "Mais de 4 mil episódios gravados com influenciadores, artistas, políticos e criadores. Gravado e editado até a postagem ou ao vivo. Estúdio montado em qualquer lugar do Brasil."],
   ["solucoes", "Soluções | AR1 Studios", "Produzimos para você, montamos a estrutura para a sua equipe produzir, ou os dois."],
   ["consultoria-podcast", "Consultoria de estúdio de podcast | Projeto, implantação e treinamento", "Do diagnóstico ao treinamento da equipe: seu estúdio nasce funcionando. AR1 Studios, Goiânia - GO."],
   ["haras-sobi", "Haras SOBI | Locação para shows, DVDs, clipes e eventos em Goiânia", "Mais de 20 cenários, pista de laço e área coberta para 4 mil pessoas na GO-010, saída de Goiânia. Locação e produção pensadas juntas.", "/media/haras-vista-aerea-2026-v1.webp"],

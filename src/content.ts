@@ -45,6 +45,13 @@ export const solutionFamilies = [
 
 export const flagshipOffers = [
   {
+    tag: "Gravação, edição e ao vivo",
+    title: "Podcast",
+    body: "Gravação, edição até a postagem ou transmissão ao vivo. No estúdio, no Haras ou em qualquer lugar do Brasil.",
+    href: "/podcast",
+    image: "/media/edit-suite.webp",
+  },
+  {
     tag: "Locação e produção",
     title: "Haras SOBI",
     body: "Mais de 20 cenários, pista de laço para shows e DVDs e espaço coberto para até 4 mil pessoas.",
@@ -59,6 +66,13 @@ export const flagshipOffers = [
     image: "/media/camera-auction.webp",
   },
   {
+    tag: "Projeto, implantação e treinamento",
+    title: "Consultoria de estúdio",
+    body: "Do diagnóstico ao treinamento da equipe, para a estrutura própria funcionar sem depender da AR1.",
+    href: "/consultoria-podcast",
+    image: "/media/consultoria-pos-producao.webp",
+  },
+  {
     tag: "Filme e patrimônio",
     title: "Filme de Legado",
     body: "Pesquisa, roteiro e produção para histórias que precisam permanecer com valor e clareza.",
@@ -70,34 +84,41 @@ export const flagshipOffers = [
 export const intentRoutes = [
   {
     number: "01",
+    prompt: "Gravar um podcast, no estúdio ou ao vivo",
+    destination: "Ver Podcast",
+    body: "Mais de 4 mil episódios. Você grava, a gente edita até a postagem. Ou transmite ao vivo.",
+    href: "/podcast",
+  },
+  {
+    number: "02",
     prompt: "Gravar um show, DVD, clipe ou campanha",
     destination: "Ver o Haras SOBI",
     body: "Mais de 20 cenários, pista de laço e área coberta para 4 mil pessoas em uma só locação.",
     href: "/haras-sobi",
   },
   {
-    number: "02",
+    number: "03",
     prompt: "Transmitir um leilão ou evento ao vivo",
     destination: "Conhecer o Leilão 360",
     body: "Aquecimento, transmissão dirigida e melhores momentos, tudo em uma operação.",
     href: "/leilao-360",
   },
   {
-    number: "03",
+    number: "04",
     prompt: "Montar ou reorganizar um estúdio de podcast",
     destination: "Ver a consultoria",
     body: "Projetamos espaço, acústica, equipamento e rotina para o estúdio funcionar depois da inauguração.",
     href: "/consultoria-podcast",
   },
   {
-    number: "04",
+    number: "05",
     prompt: "Contar a história da empresa ou da família",
     destination: "Ver o Filme de Legado",
     body: "Pesquisa, entrevistas e filme para uma história que precisa durar.",
     href: "/filme-de-legado",
   },
   {
-    number: "05",
+    number: "06",
     prompt: "Produzir conteúdo recorrente sem improviso",
     destination: "Ver soluções",
     body: "Transformamos o conhecimento da sua equipe em vídeos, podcasts e fotos com cadência.",
@@ -107,9 +128,15 @@ export const intentRoutes = [
 
 export const relatedJourneys = {
   consulting: [
+    { label: "01 · Serviço independente", title: "Podcast", body: "Gravação, edição até a postagem ou transmissão ao vivo.", href: "/podcast" },
     { label: "Operação recorrente", title: "Conteúdo depois da implantação", body: "Organize especialistas, pauta, captação e entregas para que o estúdio ganhe uso consistente.", href: "/solucoes#familias" },
     { label: "Formato móvel", title: "Podcast itinerante", body: "Leve entrevistas e conversas para empresas, feiras, eventos e locações especiais.", href: "/servicos/podcast-itinerante" },
     { label: "Escopo combinado", title: "Projetos integrados", body: "Coordene estúdio, conteúdo, audiovisual e transmissão dentro de uma mesma arquitetura.", href: "/servicos/projetos-integrados" },
+  ],
+  podcast: [
+    { label: "01 · Cenário externo", title: "Haras SOBI", body: "Grave temporadas especiais em bosque, lago ou pista.", href: "/haras-sobi" },
+    { label: "02 · Serviço independente", title: "Consultoria de estúdio", body: "Projeto, implantação e treinamento para quem quer estrutura própria.", href: "/consultoria-podcast" },
+    { label: "03 · Ao vivo com venda", title: "Leilão 360", body: "Transmissão de leilão como operação única.", href: "/leilao-360" },
   ],
   haras: [
     { label: "Evento e transmissão", title: "Leilão 360", body: "Combine locação, aquecimento, operação ao vivo e ativos posteriores.", href: "/leilao-360" },
@@ -220,7 +247,7 @@ export const evidenceCases = [
   },
   {
     status: "Método consultivo",
-    label: "Estúdios de podcast",
+    label: "Consultoria de estúdio",
     title: "Estrutura, fluxo e equipe desenhados como uma única operação.",
     body: "A consultoria parte do uso e da viabilidade para orientar espaço, acústica, cenografia, áudio, vídeo, iluminação, equipamentos, implantação e treinamento.",
     proof: "Diagnóstico · projeto · implantação · ativação",
@@ -315,12 +342,14 @@ export const legacyServiceDetails = [
 ] as const;
 
 export const projectOptions = [
+  "Gravação de podcast (gravado ou ao vivo)",
+  "Podcast itinerante em feira, congresso ou evento",
+  "Transmissão ao vivo",
   "Operação de conteúdo",
   "Diagnóstico de capacidade",
   "Projeto e ativação de estúdio",
   "Consultoria e implantação de estúdio de podcast",
   "Haras SOBI",
-  "Transmissão ao vivo",
   "Leilão 360",
   "Filme de marca ou legado",
   "Evento ou projeto especial",

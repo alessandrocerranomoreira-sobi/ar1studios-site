@@ -8,6 +8,7 @@ import "./App.css";
 import { getCampaignContext, trackEvent } from "./analytics";
 import { CITY, CNPJ, EMAIL, GA4_ID, HARAS_ADDRESS, LEGAL_NAME, MAPS_URL, SITE_NAME, TAGLINE, WHATSAPP_DISPLAY, whatsappLink, whatsappMessageLink } from "./config/site";
 import { proof } from "./config/proof";
+import { podcastGallery } from "./content/podcast-gallery";
 import {
   faq,
   evidenceCases,
@@ -40,7 +41,9 @@ type LeadForm = {
 const initialLead: LeadForm = { name: "", role: "", phone: "", email: "", company: "", project: "", brief: "", date: "" };
 
 function pageInterest(path = window.location.pathname) {
-  const interests: Record<string, string> = { "/": "Ainda preciso entender a melhor solução", "/haras-sobi": "Haras SOBI", "/leilao-360": "Leilão 360", "/consultoria-podcast": "Consultoria e implantação de estúdio de podcast", "/filme-de-legado": "Filme de marca ou legado", "/solucoes": "Operação de conteúdo", "/metodo": "Ainda preciso entender a melhor solução", "/sobre": "Ainda preciso entender a melhor solução" };
+  if (path === "/podcast" && window.location.hash === "#itinerante") return "Podcast itinerante em feira, congresso ou evento";
+  if (path === "/podcast" && window.location.hash === "#ao-vivo") return "Transmissão ao vivo";
+  const interests: Record<string, string> = { "/": "Ainda preciso entender a melhor solução", "/podcast": "Gravação de podcast (gravado ou ao vivo)", "/haras-sobi": "Haras SOBI", "/leilao-360": "Leilão 360", "/consultoria-podcast": "Consultoria e implantação de estúdio de podcast", "/filme-de-legado": "Filme de marca ou legado", "/solucoes": "Operação de conteúdo", "/metodo": "Ainda preciso entender a melhor solução", "/sobre": "Ainda preciso entender a melhor solução" };
   return interests[path.replace(/\/+$/, "") || "/"] ?? "Ainda preciso entender a melhor solução";
 }
 
@@ -152,10 +155,11 @@ function Header() {
       <button ref={menuButtonRef} className="menu-button" onClick={() => setOpen(!open)} aria-controls="main-navigation" aria-expanded={open} aria-label={open ? "Fechar menu" : "Abrir menu"}><span aria-hidden="true" /><span aria-hidden="true" /></button>
       {open && <button className="menu-backdrop" type="button" tabIndex={-1} aria-label="Fechar menu" onClick={() => setOpen(false)} />}
       <nav ref={navRef} id="main-navigation" className={open ? "nav open" : "nav"} aria-label="Navegação principal">
-        <a href="/solucoes" aria-current={current("/solucoes")} onClick={() => setOpen(false)}>Soluções</a>
+        <a href="/podcast" aria-current={current("/podcast")} onClick={() => setOpen(false)}>Podcast</a>
+        <a href="/consultoria-podcast" aria-current={current("/consultoria-podcast")} onClick={() => setOpen(false)}>Consultoria</a>
         <a href="/haras-sobi" aria-current={current("/haras-sobi")} onClick={() => setOpen(false)}>Haras SOBI</a>
         <a href="/leilao-360" aria-current={current("/leilao-360")} onClick={() => setOpen(false)}>Leilão 360</a>
-        <a href="/consultoria-podcast" aria-current={current("/consultoria-podcast")} onClick={() => setOpen(false)}>Estúdios</a>
+        <a href="/solucoes" aria-current={current("/solucoes")} onClick={() => setOpen(false)}>Soluções</a>
         <a href="/sobre" aria-current={current("/sobre")} onClick={() => setOpen(false)}>Sobre</a>
         <a href="#contato" className="nav-cta" onClick={() => { trackEvent("cta_primary_click", { page: path }); setOpen(false); }}>Solicitar proposta</a>
         <a href={whatsappLink("o projeto desta página")} className="header-whatsapp" aria-label="Falar no WhatsApp" onClick={() => trackEvent("whatsapp_click", { location: "header", page: path, interest: pageInterest(path) })}>WhatsApp</a>
@@ -174,8 +178,8 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="footer-brand"><Logo compact /><p>{TAGLINE}</p><p>{CITY}</p></div>
-      <div className="footer-nav" aria-label="Links institucionais">
-        <span>Haras SOBI</span><p>{HARAS_ADDRESS}</p>{MAPS_URL ? <a href={MAPS_URL} target="_blank" rel="noreferrer">Ver no mapa</a> : null}<a href="/metodo">Método</a>
+      <div className="footer-nav" aria-label="Soluções">
+        <span>Soluções</span><a href="/podcast">Podcast</a><a href="/consultoria-podcast">Consultoria de estúdio</a><a href="/podcast#ao-vivo">Transmissão ao vivo</a><a href="/haras-sobi">Haras SOBI</a><a href="/leilao-360">Leilão 360</a><a href="/filme-de-legado">Filme de Legado</a><p>{HARAS_ADDRESS}</p>{MAPS_URL ? <a href={MAPS_URL} target="_blank" rel="noreferrer">Ver no mapa</a> : null}<a href="/metodo">Método</a>
       </div>
       <div className="footer-contact"><span>Contato</span><a href={whatsappLink("uma proposta")}>{WHATSAPP_DISPLAY}</a><a href={`mailto:${EMAIL}`}>{EMAIL}</a>{socialLinks.map(([label, url]) => <a key={label} href={url}>{label}</a>)}</div>
       <small>CNPJ {CNPJ} · © {new Date().getFullYear()} {SITE_NAME}. Todos os direitos reservados.</small>
@@ -236,12 +240,13 @@ function ContactForm({ defaultProject = "" }: { defaultProject?: string }) {
 }
 
 function ContactSection({ defaultProject = "", title = "Conte o que precisa acontecer." }: { defaultProject?: string; title?: string }) {
+  const selectedProject = new URLSearchParams(window.location.search).get("projeto") || (window.location.pathname === "/podcast" ? pageInterest("/podcast") : defaultProject);
   return (
     <section id="contato" className="contact section-dark">
       <div className="contact-visual"><img src="/media/glow-horizontal.webp" alt="Luz no horizonte" loading="lazy" /><div className="image-overlay" /></div>
       <div className="contact-layout page-shell">
-        <Reveal className="contact-copy"><p className="eyebrow">Próximo passo</p><h2>{title}</h2><p>Responde uma pessoa da equipe, não um robô. Se preferir, chame direto no WhatsApp.</p><a className="button primary contact-whatsapp" href={whatsappLink(defaultProject || "a melhor solução")} onClick={() => trackEvent("whatsapp_click", { location: "contact", page: window.location.pathname, interest: defaultProject || pageInterest(window.location.pathname) })}>Chamar no WhatsApp · {WHATSAPP_DISPLAY}</a><ul className="contact-points"><li><span>01</span>Resposta humana e contextual</li><li><span>02</span>Escopo antes do orçamento</li><li><span>03</span>Agenda e viabilidade confirmadas</li></ul></Reveal>
-        <ContactForm defaultProject={defaultProject} />
+        <Reveal className="contact-copy"><p className="eyebrow">Próximo passo</p><h2>{title}</h2><p>Responde uma pessoa da equipe, não um robô. Se preferir, chame direto no WhatsApp.</p><a className="button primary contact-whatsapp" href={whatsappLink(selectedProject || "a melhor solução")} onClick={() => trackEvent("whatsapp_click", { location: "contact", page: window.location.pathname, interest: selectedProject || pageInterest(window.location.pathname) })}>Chamar no WhatsApp · {WHATSAPP_DISPLAY}</a><ul className="contact-points"><li><span>01</span>Resposta humana e contextual</li><li><span>02</span>Escopo antes do orçamento</li><li><span>03</span>Agenda e viabilidade confirmadas</li></ul></Reveal>
+        <ContactForm defaultProject={selectedProject} />
       </div>
     </section>
   );
@@ -346,7 +351,7 @@ function Showreel() {
 }
 
 function ProofStrip() {
-  const entries = [[proof.shows, "shows e DVDs gravados"], [proof.leiloes, "leilões transmitidos"], [proof.estudios, "estúdios implantados"], [proof.horasAoVivo, "horas de transmissão ao vivo"]].filter(([value]) => value !== "TODO");
+  const entries = [[proof.episodios.display, proof.episodios.label], [proof.shows, "shows e DVDs gravados"], [proof.leiloes, "leilões transmitidos"], [proof.estudios, "estúdios implantados"], [proof.horasAoVivo, "horas de transmissão ao vivo"]].filter(([value]) => value !== "TODO");
   if (entries.length === 0) return null;
   return <section className="proof-strip section-light"><div className="page-shell"><Reveal><p className="eyebrow">Projetos realizados</p><h2>Só publicamos o que fizemos.</h2><p>Cada número e cada imagem deste site vêm de projetos entregues, com autorização de quem contratou.</p></Reveal><div className="fact-grid light">{entries.map(([value, label]) => <div className="fact-card" key={label}><strong>{value}</strong><span>{label}</span></div>)}</div></div></section>;
 }
@@ -444,11 +449,11 @@ function Home() {
           <img src="/media/ar1-fachada-2026-v1.webp" alt="Fachada iluminada da AR1 Studios" fetchPriority="high" />
         </picture>
         <div className="image-overlay" />
-        <div className="home-hero-copy page-shell"><p className="eyebrow">Produção audiovisual · locação · transmissões · Goiânia - GO</p><h1>Locação de grande escala, transmissões e estúdios para projetos que não podem falhar.</h1><p>Somos a AR1 Studios, de Goiânia, no coração do Brasil. Gravamos shows e DVDs no Haras SOBI, transmitimos leilões, montamos estúdios de podcast que continuam funcionando e filmamos histórias que precisam permanecer. Do briefing à entrega, uma equipe só.</p><div className="hero-actions"><a className="button primary" href="#contato" onClick={() => trackEvent("cta_primary_click", { page: "/" })}>Solicitar proposta</a><a className="button ghost" href="/haras-sobi">Ver o Haras SOBI</a></div><p className="hero-proof">+20 cenários · Área coberta para 4 mil pessoas · Pista de laço · GO-010, saída de Goiânia</p></div>
+        <div className="home-hero-copy page-shell"><p className="eyebrow">Produção audiovisual · locação · transmissões · Goiânia - GO</p><h1>Locação de grande escala, transmissões e estúdios para projetos que não podem falhar.</h1><p>Somos a AR1 Studios, de Goiânia, no coração do Brasil. Gravamos podcasts (mais de 4 mil episódios), shows e DVDs no Haras SOBI, transmitimos leilões e eventos, montamos estúdios que continuam funcionando e filmamos histórias que precisam permanecer. Do briefing à entrega, uma equipe só.</p><div className="hero-actions"><a className="button primary" href="#contato" onClick={() => trackEvent("cta_primary_click", { page: "/" })}>Solicitar proposta</a><a className="button ghost" href="/haras-sobi">Ver o Haras SOBI</a></div><p className="hero-proof">+20 cenários · Área coberta para 4 mil pessoas · Pista de laço · GO-010, saída de Goiânia</p></div>
         <a className="hero-haras-link" href="/haras-sobi" onClick={() => trackEvent("service_view", { service_name: "Haras SOBI", cta_location: "home_hero" })}><span>Oferta principal</span><strong>Conheça o Haras SOBI</strong><b>+20 cenários · até 4 mil pessoas</b></a>
       </section>
 
-      <section className="signal-band" aria-label="Principais capacidades"><span>Shows, DVDs e campanhas</span><span>Estúdios de podcast</span><span>Transmissões ao vivo</span><span>Haras SOBI</span></section>
+      <section className="signal-band" aria-label="Principais capacidades"><span>Shows, DVDs e campanhas</span><span>Podcast e consultoria</span><span>Transmissões ao vivo</span><span>Haras SOBI</span></section>
 
       <IntentRouter />
 
@@ -458,7 +463,7 @@ function Home() {
         <div className="page-shell"><div className="section-heading"><Reveal><p className="eyebrow">Haras SOBI · GO-010, sentido Nerópolis</p><h2>Um dos maiores espaços de produção de conteúdo do Brasil fica na saída de Goiânia.</h2></Reveal><Reveal><p>Mais de 20 cenários — pista de laço, bosque, lago, palcos, salão e grande área coberta — em um só endereço. Você chega com a ideia e sai com o projeto gravado.</p><a className="button primary" href="/haras-sobi">Explorar o Haras SOBI</a></Reveal></div><div className="fact-grid">{harasFacts.map((fact) => <Reveal className="fact-card" key={fact.value}><strong>{fact.value}</strong><span>{fact.label}</span></Reveal>)}</div></div>
       </section>
 
-      <section className="flagships section-dark"><div className="page-shell"><Reveal><p className="eyebrow">Ofertas com nome e entrega definida</p><h2>Quatro formas de trabalhar com a AR1.</h2></Reveal><FlagshipGrid /><p className="section-intro">Precisa de mais de uma frente? Transmissão ao vivo, fotografia e vídeo, podcast itinerante e produção externa entram em qualquer projeto. <a className="text-link" href="/solucoes">Ver todas as soluções</a></p></div></section>
+      <section className="flagships section-dark"><div className="page-shell"><Reveal><p className="eyebrow">Ofertas com nome e entrega definida</p><h2>Cinco formas de trabalhar com a AR1.</h2></Reveal><FlagshipGrid /><p className="section-intro">Precisa de mais de uma frente? Transmissão ao vivo, fotografia e vídeo, podcast itinerante e produção externa entram em qualquer projeto. <a className="text-link" href="/solucoes">Ver todas as soluções</a></p></div></section>
 
       <section className="method-preview section-light"><div className="page-shell split"><Reveal><p className="eyebrow">Método AR1</p><h2>Clareza antes da câmera.</h2><p className="section-intro dark">Cada projeto começa pela decisão, pelo público e pelo uso. Equipamento, equipe e formato entram depois.</p><a className="text-link" href="/metodo">Conhecer o método</a></Reveal><div className="method-list">{methodSteps.map((step) => <Reveal className="method-row" key={step.number}><span>{step.number}</span><div><h3>{step.title}</h3><p>{step.body}</p></div></Reveal>)}</div></div></section>
 
@@ -485,11 +490,28 @@ function SolutionsPage() {
   </main><Footer /></>;
 }
 
+function PodcastGallery() {
+  const [category, setCategory] = useState("todos");
+  const [selected, setSelected] = useState<number | null>(null);
+  if (podcastGallery.length === 0) return null;
+  const items = category === "todos" ? podcastGallery : podcastGallery.filter((item) => item.category === category);
+  const categories = ["todos", ...Array.from(new Set(podcastGallery.map((item) => item.category)))];
+  return <section id="galeria" className="page-section section-light"><div className="page-shell"><Reveal><p className="eyebrow">Quem já sentou na nossa mesa</p><h2>Influenciadores, artistas, políticos, personalidades e quem está começando.</h2><p>Mais de 4 mil episódios. Alguns nomes você conhece. Outros começaram aqui.</p></Reveal><div className="gallery-filters">{categories.map((item) => <button type="button" key={item} className={category === item ? "active" : ""} onClick={() => setCategory(item)}>{item === "todos" ? "Todos" : item}</button>)}</div><div className="podcast-gallery">{items.map((item, index) => <button type="button" key={item.src} onClick={() => setSelected(index)}><img src={item.src} alt={item.alt} loading="lazy" /><span>{[item.guest, item.program].filter(Boolean).join(" · ")}</span></button>)}</div>{selected !== null && items[selected] ? <div className="gallery-lightbox" role="dialog" aria-modal="true" aria-label="Foto ampliada" onClick={() => setSelected(null)}><img src={items[selected].src} alt={items[selected].alt} /></div> : null}</div></section>;
+}
+
+function PodcastPage() {
+  usePageMeta("Gravação de podcast e transmissão ao vivo | AR1 Studios · Goiânia e todo o Brasil", "Mais de 4 mil episódios gravados com influenciadores, artistas, políticos e criadores. Gravado e editado até a postagem ou ao vivo. Estúdio montado em qualquer lugar do Brasil.");
+  const paths = [["Gravado e editado", "Você grava. Nós sincronizamos o áudio, colorimos a imagem, editamos, cortamos os melhores momentos, renderizamos e deixamos pronto para postar.", ["Sincronização de áudio", "Colorização", "Edição completa", "Cortes para redes", "Renderização", "Postagem opcional"]], ["Ao vivo", "Transmissão dirigida em tempo real, com troca de câmeras, inserção de telas e gravação simultânea para reaproveitar depois.", ["Direção ao vivo", "Multicâmera", "Inserção de telas e vinhetas", "Gravação simultânea", "Cortes depois da live"]]] as const;
+  const audience = [["Quem está começando", "Você chega com o tema. A gente cuida de câmera, luz, som e edição, e orienta o formato."], ["Criadores e influenciadores", "Cadência e qualidade para manter a audiência: gravação em série, cortes para redes e entrega no prazo."], ["Artistas, políticos e personalidades", "Agenda apertada, imagem cuidada: gravação eficiente, direção de entrevista e material aprovado antes de sair."], ["Empresas e instituições", "Podcast corporativo, conversas com especialistas e conteúdo para clientes, com equipe e rotina que cabem na empresa."]] as const;
+  const steps = [["01", "Briefing", "Tema, formato, convidados e onde publicar."], ["02", "Agenda", "Data no estúdio, no Haras SOBI ou no seu evento."], ["03", "Gravação ou live", "Equipe, câmeras, luz e som com direção."], ["04", "Pós-produção", "Sincronização, colorização, edição, cortes e renderização."], ["05", "Entrega e postagem", "Arquivo final e, se quiser, publicação nas suas plataformas."]] as const;
+  return <><Header /><main id="conteudo"><PageHero eyebrow="Podcast · gravação, edição e transmissão ao vivo · Goiânia e todo o Brasil" title="Mais de 4 mil episódios gravados. O próximo pode ser o seu." summary="Influenciadores, artistas, políticos, personalidades e gente que está começando gravam com a AR1. Você escolhe: grava e a gente edita até a postagem, ou vai ao vivo. No nosso estúdio, no Haras SOBI ou em qualquer lugar do Brasil." image="/media/edit-suite.webp" secondaryHref="#galeria" secondaryCta="Ver quem já gravou" breadcrumbs={[{ label: "Podcast" }]} /><section className="signal-band"><span>+4 mil episódios</span><span>Gravado ou ao vivo</span><span>Estúdio em qualquer lugar do Brasil</span><span>Edição até a postagem</span></section><section className="page-section section-light"><div className="page-shell"><Reveal><p className="eyebrow">Como você quer publicar</p><h2>Gravado ou ao vivo. Você escolhe, a gente entrega.</h2></Reveal><div className="value-grid">{paths.map(([title, body, items], index) => <Reveal className="value-card" key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{body}</p><ul>{items.map((item) => <li key={item}>{item}</li>)}</ul></Reveal>)}</div><p className="section-intro dark">Não sabe qual? Comece pelo gravado. Dá para migrar para o ao vivo quando a audiência pedir.</p></div></section><PodcastGallery /><section className="page-section section-dark"><div className="page-shell"><Reveal><p className="eyebrow">Para quem é</p><h2>Do primeiro episódio ao programa com audiência.</h2></Reveal><div className="consulting-fit-grid">{audience.map(([title, body], index) => <Reveal className="consulting-fit-card" key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{body}</p></Reveal>)}</div></div></section><section id="itinerante" className="page-section section-light"><div className="page-shell split"><Reveal><p className="eyebrow">Podcast itinerante · todo o Brasil</p><h2>Montamos o estúdio dentro da sua feira, congresso ou evento.</h2><p>Cenário, luz, áudio, câmeras e equipe chegam onde o público está. Grave entrevistas com palestrantes, patrocinadores e visitantes durante o evento.</p><a className="button primary" href="#contato">Solicitar proposta</a></Reveal><Reveal className="large-copy"><ul><li>Montagem e desmontagem no local</li><li>Cenário com a identidade do evento ou patrocinador</li><li>Gravação em série com fila de convidados</li><li>Cortes rápidos para as redes do evento</li></ul></Reveal></div></section><section id="ao-vivo" className="page-section section-dark"><div className="page-shell split"><Reveal><p className="eyebrow">Transmissão ao vivo · congressos, palestras e eventos</p><h2>Do palco para quem não pôde estar lá.</h2><p>Transmitimos congressos, palestras, eventos corporativos, culturais e institucionais em Goiânia e em todo o Brasil.</p><a className="button primary" href="#contato">Solicitar proposta</a></Reveal><Reveal className="large-copy"><ul><li>Multicâmera com direção ao vivo</li><li>Inserção de slides, telões e vinhetas</li><li>Áudio integrado à mesa do evento</li><li>Planejamento técnico de sinal e conexão</li><li>Gravação completa para reaproveitar</li></ul><a className="text-link" href="/leilao-360">Leilão ao vivo? Esse tem página própria: Leilão 360.</a></Reveal></div></section><section className="page-section section-light"><div className="page-shell"><Reveal><p className="eyebrow">Como funciona</p><h2>Do convite ao episódio publicado.</h2></Reveal><ol className="consulting-steps">{steps.map(([number, title, body]) => <li className="consulting-step" key={number}><span>{number}</span><div><h3>{title}</h3><p>{body}</p></div></li>)}</ol></div></section><RelatedJourneys items={relatedJourneys.podcast} title="Continue pelo formato que o projeto precisa." /><ContactSection defaultProject="Gravação de podcast (gravado ou ao vivo)" title="Vamos gravar o seu próximo episódio?" /></main><Footer /></>;
+}
+
 function ConsultingPage() {
   usePageMeta("Consultoria de estúdio de podcast | Projeto, implantação e treinamento", "Do diagnóstico ao treinamento da equipe: seu estúdio nasce funcionando. AR1 Studios, Goiânia - GO.");
   return (
     <><Header /><main id="conteudo" className="consulting-page">
-      <PageHero eyebrow="Estúdios de podcast · consultoria e implantação" title="Seu estúdio precisa funcionar depois da inauguração. Não só na foto." summary="Antes de comprar equipamento, definimos para que o estúdio serve, quem opera e com que rotina. Depois projetamos, implantamos, testamos e treinamos a sua equipe." image="/media/consultoria-pos-producao.webp" secondaryHref="#diagnostico" secondaryCta="Ver as 5 etapas" breadcrumbs={[{ label: "Soluções", href: "/solucoes" }, { label: "Consultoria de podcast" }]} />
+      <PageHero eyebrow="Consultoria de estúdio · projeto e implantação" title="Seu estúdio precisa funcionar depois da inauguração. Não só na foto." summary="Antes de comprar equipamento, definimos para que o estúdio serve, quem opera e com que rotina. Depois projetamos, implantamos, testamos e treinamos a sua equipe." image="/media/consultoria-pos-producao.webp" secondaryHref="#diagnostico" secondaryCta="Ver as 5 etapas" breadcrumbs={[{ label: "Soluções", href: "/solucoes" }, { label: "Consultoria de estúdio" }]} />
 
       <section id="diagnostico" className="consulting-intro section-light"><div className="page-shell split"><Reveal><p className="eyebrow">Decisão antes da compra</p><h2>O investimento certo começa pelo uso.</h2></Reveal><Reveal className="large-copy"><p>Quem vai gravar? Com que frequência? Para quais formatos? Quem opera, edita, publica e mantém? Essas respostas definem o projeto antes da lista de equipamentos.</p><strong>Um estúdio funcional conecta estrutura, pessoas e rotina.</strong></Reveal></div></section>
 
@@ -619,6 +641,7 @@ function App() {
 
   let page: ReactNode = <NotFound />;
   if (path === "/") page = <Home />;
+  else if (path === "/podcast") page = <PodcastPage />;
   else if (path === "/solucoes") page = <SolutionsPage />;
   else if (path === "/consultoria-podcast") page = <ConsultingPage />;
   else if (path === "/metodo") page = <MethodPage />;

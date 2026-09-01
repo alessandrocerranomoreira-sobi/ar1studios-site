@@ -4,6 +4,7 @@ export const CNPJ = "30.687.924/0001-79";
 export const CITY = "Goiânia - GO";
 export const TAGLINE = "Produção audiovisual, locação e transmissões para projetos que não podem falhar.";
 export const HARAS_ADDRESS = "Haras SOBI · GO-010, sentido Nerópolis, saída de Goiânia - GO";
+export const STUDIO_ADDRESS = "TODO_ENDERECO_ESTUDIO_GOIANIA";
 export const MAPS_URL = "";
 export const EMAIL = "contato@ar1studios.com.br";
 export const WHATSAPP_DISPLAY = "(62) 9835-4354";
