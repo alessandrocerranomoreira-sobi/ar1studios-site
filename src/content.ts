@@ -47,7 +47,7 @@ export const flagshipOffers = [
     title: "Haras SOBI",
     body: "Mais de 20 cenários, pista de laço para shows e DVDs e espaço coberto para até 4 mil pessoas.",
     href: "/haras-sobi",
-    image: "/media/horse.webp",
+    image: "/media/haras-show-noturno-2026-v1.webp",
   },
   {
     tag: "Transmissão e conteúdo",
@@ -64,6 +64,77 @@ export const flagshipOffers = [
     image: "/media/cattle-wide.webp",
   },
 ] as const;
+
+export const intentRoutes = [
+  {
+    number: "01",
+    prompt: "Quero organizar uma operação de conteúdo",
+    destination: "Explorar soluções",
+    body: "Para transformar conhecimento interno em pauta, cadência, produção e ativos recorrentes.",
+    href: "/solucoes#familias",
+  },
+  {
+    number: "02",
+    prompt: "Quero montar ou reorganizar um estúdio",
+    destination: "Ver consultoria",
+    body: "Para decidir espaço, acústica, equipamentos, fluxo, implantação e treinamento antes da compra.",
+    href: "/consultoria-podcast",
+  },
+  {
+    number: "03",
+    prompt: "Quero realizar um evento ou transmissão",
+    destination: "Conhecer Leilão 360",
+    body: "Para integrar aquecimento, operação ao vivo e conteúdos posteriores em uma única jornada.",
+    href: "/leilao-360",
+  },
+  {
+    number: "04",
+    prompt: "Quero uma locação para um grande projeto",
+    destination: "Explorar o Haras SOBI",
+    body: "Para shows, DVDs, campanhas, filmes, podcasts, transmissões e experiências de grande escala.",
+    href: "/haras-sobi",
+  },
+  {
+    number: "05",
+    prompt: "Quero preservar uma história ou patrimônio",
+    destination: "Ver Filme de Legado",
+    body: "Para reunir pesquisa, território, entrevistas e imagem em uma narrativa capaz de permanecer.",
+    href: "/filme-de-legado",
+  },
+] as const;
+
+export const relatedJourneys = {
+  consulting: [
+    { label: "Operação recorrente", title: "Conteúdo depois da implantação", body: "Organize especialistas, pauta, captação e entregas para que o estúdio ganhe uso consistente.", href: "/solucoes#familias" },
+    { label: "Formato móvel", title: "Podcast itinerante", body: "Leve entrevistas e conversas para empresas, feiras, eventos e locações especiais.", href: "/servicos/podcast-itinerante" },
+    { label: "Escopo combinado", title: "Projetos integrados", body: "Coordene estúdio, conteúdo, audiovisual e transmissão dentro de uma mesma arquitetura.", href: "/servicos/projetos-integrados" },
+  ],
+  haras: [
+    { label: "Evento e transmissão", title: "Leilão 360", body: "Combine locação, aquecimento, operação ao vivo e ativos posteriores.", href: "/leilao-360" },
+    { label: "Memória e patrimônio", title: "Filme de Legado", body: "Use território, história e imagem para construir uma narrativa de permanência.", href: "/filme-de-legado" },
+    { label: "Produção em locação", title: "Produção externa", body: "Dimensione equipe, logística, captação e uso conforme a locação e a escala.", href: "/servicos/producao-externa" },
+  ],
+  method: [
+    { label: "Arquitetura comercial", title: "Soluções AR1", body: "Entenda qual família de solução responde melhor ao desafio da organização.", href: "/solucoes" },
+    { label: "Construir capacidade", title: "Consultoria de podcast", body: "Aplique o método ao diagnóstico, projeto, implantação e ativação de um estúdio.", href: "/consultoria-podcast" },
+    { label: "Projeto de escala", title: "Haras SOBI", body: "Veja como locação e planejamento se conectam em produções de grande porte.", href: "/haras-sobi" },
+  ],
+  about: [
+    { label: "Como a AR1 trabalha", title: "Método AR1", body: "Conheça as decisões, responsabilidades e critérios que orientam cada projeto.", href: "/metodo" },
+    { label: "O que a AR1 organiza", title: "Soluções", body: "Explore operação de conteúdo, construção de capacidade e projetos especiais.", href: "/solucoes" },
+    { label: "Patrimônio em narrativa", title: "Filme de Legado", body: "Veja uma oferta criada para histórias que precisam permanecer.", href: "/filme-de-legado" },
+  ],
+  live: [
+    { label: "Locação e produção", title: "Haras SOBI", body: "Integre espaço, público, montagem e operação audiovisual em uma mesma proposta.", href: "/haras-sobi" },
+    { label: "Capacidade técnica", title: "Transmissão ao vivo", body: "Conheça a frente de planejamento, captação, direção e operação de transmissão.", href: "/servicos/transmissao-ao-vivo" },
+    { label: "Continuidade editorial", title: "Eventos e conteúdo", body: "Faça o evento continuar por meio de entrevistas, registros e peças posteriores.", href: "/servicos/eventos-e-conteudo" },
+  ],
+  legacy: [
+    { label: "Território e locação", title: "Haras SOBI", body: "Encontre cenários e escala para entrevistas, patrimônio, filmes e campanhas.", href: "/haras-sobi" },
+    { label: "Direção institucional", title: "Sobre a AR1", body: "Entenda a experiência e os compromissos que sustentam a atuação da marca.", href: "/sobre" },
+    { label: "Captação e acervo", title: "Fotografia e vídeo", body: "Planeje roteiro, entrevistas, captação e organização de ativos complementares.", href: "/servicos/fotografia-e-video" },
+  ],
+} as const;
 
 export const visualStories = [
   {
@@ -106,8 +177,8 @@ export const visualStories = [
     label: "Haras SOBI",
     title: "Uma locação capaz de mudar de escala e linguagem.",
     body: "Mais de 20 cenários, pista para shows e DVDs e espaço coberto para até 4 mil pessoas.",
-    image: "/media/horse.webp",
-    alt: "Cavalo em paisagem rural ao entardecer",
+    image: "/media/haras-vista-aerea-2026-v1.webp",
+    alt: "Vista aérea real da pista e das áreas do Haras SOBI",
     href: "/haras-sobi",
     cta: "Explorar o Haras",
   },
@@ -129,8 +200,8 @@ export const evidenceCases = [
     title: "Escala física para projetos que não cabem em um estúdio convencional.",
     body: "Uma plataforma de locação e produção com mais de 20 cenários, pista de laço para shows e gravações de DVD e área coberta para até 4 mil pessoas.",
     proof: "+20 cenários · pista de laço · até 4 mil pessoas",
-    image: "/media/horse.webp",
-    alt: "Cavalo representando as possibilidades de produção no Haras SOBI",
+    image: "/media/haras-espaco-coberto-2026-v1.webp",
+    alt: "Área coberta real do Haras SOBI preparada para projetos de grande escala",
     href: "/haras-sobi",
     cta: "Ver estrutura",
   },
@@ -233,10 +304,10 @@ export const faq = [
 
 export const legacyServiceDetails = [
   { slug: "transmissao-ao-vivo", eyebrow: "Projetos especiais", title: "Transmissões ao vivo com planejamento e direção.", summary: "Uma operação dimensionada para conectar evento, público e conteúdos posteriores com clareza técnica.", image: "/media/camera-auction.webp", project: "Transmissão ao vivo", items: ["Planejamento técnico", "Captação e direção de corte", "Operação de transmissão", "Conteúdos derivados quando previstos"] },
-  { slug: "fotografia-e-video", eyebrow: "Projetos especiais", title: "Fotografia e vídeo para explicar, registrar e permanecer.", summary: "Produções para empresas, eventos, propriedades, marcas e histórias que pedem direção própria.", image: "/media/horse.webp", project: "Filme de marca ou legado", items: ["Planejamento e roteiro", "Fotografia e captação", "Entrevistas e depoimentos", "Edição e organização dos ativos"] },
+  { slug: "fotografia-e-video", eyebrow: "Projetos especiais", title: "Fotografia e vídeo para explicar, registrar e permanecer.", summary: "Produções para empresas, eventos, propriedades, marcas e histórias que pedem direção própria.", image: "/media/haras-pista-e-cavalo-2026-v1.webp", project: "Filme de marca ou legado", items: ["Planejamento e roteiro", "Fotografia e captação", "Entrevistas e depoimentos", "Edição e organização dos ativos"] },
   { slug: "podcast-itinerante", eyebrow: "Operar conteúdo", title: "Conteúdo onde as conversas realmente acontecem.", summary: "Estrutura móvel para entrevistas, podcasts e agendas editoriais em empresas, feiras, eventos e locações especiais.", image: "/media/edit-suite.webp", project: "Operação de conteúdo", items: ["Desenho editorial", "Captação de áudio e vídeo", "Operação no local", "Cortes e entregas conforme escopo"] },
   { slug: "eventos-e-conteudo", eyebrow: "Projetos especiais", title: "Conteúdo que faz o evento continuar depois do palco.", summary: "Planejamento e produção para registrar, ativar e prolongar a presença de eventos e marcas.", image: "/media/event-stage.webp", project: "Evento ou projeto especial", items: ["Plano de conteúdo", "Captação de momentos e entrevistas", "Peças de circulação", "Entrega organizada por finalidade"] },
-  { slug: "producao-externa", eyebrow: "Haras SOBI e locações", title: "A locação certa também faz parte da narrativa.", summary: "Produções no Haras SOBI e em outras locações avaliadas de acordo com a história, a logística e a escala do projeto.", image: "/media/mist-fields.webp", project: "Haras SOBI", items: ["Planejamento de locação", "Equipe e logística", "Captação de imagem e som", "Produção dimensionada ao uso"] },
+  { slug: "producao-externa", eyebrow: "Haras SOBI e locações", title: "A locação certa também faz parte da narrativa.", summary: "Produções no Haras SOBI e em outras locações avaliadas de acordo com a história, a logística e a escala do projeto.", image: "/media/haras-bosque-2026-v1.webp", project: "Haras SOBI", items: ["Planejamento de locação", "Equipe e logística", "Captação de imagem e som", "Produção dimensionada ao uso"] },
   { slug: "projetos-integrados", eyebrow: "AR1 Studios", title: "Quando o projeto precisa de mais de uma frente.", summary: "Estratégia, estrutura, audiovisual, transmissão e conteúdo coordenados em uma operação sob medida.", image: "/media/cattle-wide.webp", project: "Ainda preciso entender a melhor solução", items: ["Arquitetura de escopo", "Integração entre frentes", "Cronograma e coordenação", "Entregas por etapa"] },
   { slug: "consultoria-implantacao-estudios-podcast", eyebrow: "Construir capacidade", title: "Implantar um estúdio é construir uma operação.", summary: "Diagnóstico, projeto, ativação e suporte para transformar espaço e equipamentos em uma rotina funcional.", image: "/media/edit-suite.webp", project: "Projeto e ativação de estúdio", items: ["Diagnóstico de uso", "Projeto técnico", "Implantação e testes", "Treinamento e suporte"] },
 ] as const;

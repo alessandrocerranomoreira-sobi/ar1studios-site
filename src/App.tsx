@@ -5,17 +5,20 @@ import "@fontsource/manrope/latin-600.css";
 import "@fontsource/manrope/latin-700.css";
 import "@fontsource/manrope/latin-800.css";
 import "./App.css";
+import { getCampaignContext, trackEvent } from "./analytics";
 import {
   faq,
   evidenceCases,
   flagshipOffers,
   harasApplications,
   harasFacts,
+  intentRoutes,
   legacyServiceDetails,
   methodSteps,
   podcastConsulting,
   principles,
   projectOptions,
+  relatedJourneys,
   siteConfig,
   solutionFamilies,
   visualStories,
@@ -51,6 +54,7 @@ function usePageMeta(title: string, description: string) {
     setMeta('meta[name="twitter:description"]', description);
     const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (canonical) canonical.href = canonicalUrl;
+    trackEvent("page_view", { page_title: title });
   }, [title, description]);
 }
 
@@ -155,10 +159,18 @@ function Reveal({ children, className = "" }: { children: ReactNode; className?:
 function ContactForm({ defaultProject = "" }: { defaultProject?: string }) {
   const [lead, setLead] = useState<LeadForm>({ ...initialLead, project: projectOptions.includes(defaultProject as typeof projectOptions[number]) ? defaultProject : "" });
   const [status, setStatus] = useState("");
+  const started = useRef(false);
   const update = (field: keyof LeadForm, value: string) => setLead((current) => ({ ...current, [field]: value }));
+
+  const registerStart = () => {
+    if (started.current) return;
+    started.current = true;
+    trackEvent("form_start", { project_type: lead.project || "não selecionado" });
+  };
 
   function submit(event: FormEvent) {
     event.preventDefault();
+    const campaign = getCampaignContext();
     const message = [
       "Olá, AR1 Studios. Quero solicitar uma proposta.",
       `Nome: ${lead.name}`,
@@ -169,20 +181,27 @@ function ContactForm({ defaultProject = "" }: { defaultProject?: string }) {
       `Interesse: ${lead.project}`,
       lead.date ? `Data prevista: ${lead.date}` : "",
       lead.brief ? `Necessidade: ${lead.brief}` : "",
+      campaign.source ? `Origem: ${campaign.source}` : "",
+      campaign.medium ? `Mídia: ${campaign.medium}` : "",
+      campaign.campaign ? `Campanha: ${campaign.campaign}` : "",
     ].filter(Boolean).join("\n");
 
+    trackEvent("form_submit_attempt", { project_type: lead.project });
+
     if (siteConfig.whatsappNumber) {
+      trackEvent("whatsapp_open", { project_type: lead.project });
       window.open(`https://wa.me/${siteConfig.whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
       setStatus("Conclua o envio no WhatsApp para que a equipe receba sua solicitação.");
       return;
     }
 
+    trackEvent("email_open", { project_type: lead.project });
     window.location.href = `mailto:${siteConfig.email}?subject=${encodeURIComponent("Solicitação de proposta AR1 Studios")}&body=${encodeURIComponent(message)}`;
     setStatus(`Conclua o envio no aplicativo de e-mail. Se ele não abrir, escreva para ${siteConfig.email}.`);
   }
 
   return (
-    <form className="lead-form" onSubmit={submit} aria-label="Solicitação de proposta" aria-describedby="form-status form-privacy">
+    <form className="lead-form" onSubmit={submit} onFocus={registerStart} aria-label="Solicitação de proposta" aria-describedby="form-status form-privacy">
       <p className="form-heading full"><span>Briefing inicial</span><strong>Conte o essencial. A AR1 organiza o próximo passo.</strong></p>
       <div className="field"><label htmlFor="name">Nome <span>obrigatório</span></label><input id="name" autoComplete="name" maxLength={80} required value={lead.name} onChange={(event) => update("name", event.target.value)} /></div>
       <div className="field"><label htmlFor="role">Cargo ou função</label><input id="role" autoComplete="organization-title" maxLength={100} value={lead.role} onChange={(event) => update("role", event.target.value)} /></div>
@@ -211,12 +230,26 @@ function ContactSection({ defaultProject = "", title = "Vamos colocar seu próxi
   );
 }
 
-function PageHero({ eyebrow, title, summary, image, cta = "Solicitar proposta", href = "#contato" }: { eyebrow: string; title: string; summary: string; image: string; cta?: string; href?: string }) {
+type BreadcrumbItem = { label: string; href?: string };
+
+function Breadcrumbs({ items }: { items: readonly BreadcrumbItem[] }) {
+  return (
+    <nav className="breadcrumbs" aria-label="Trilha de navegação">
+      <a href="/">Início</a>
+      {items.map((item) => <span key={`${item.href ?? "current"}-${item.label}`}>{item.href ? <a href={item.href}>{item.label}</a> : <b aria-current="page">{item.label}</b>}</span>)}
+    </nav>
+  );
+}
+
+function PageHero({ eyebrow, title, summary, image, mobileImage, cta = "Solicitar proposta", href = "#contato", breadcrumbs = [{ label: eyebrow }] }: { eyebrow: string; title: string; summary: string; image: string; mobileImage?: string; cta?: string; href?: string; breadcrumbs?: readonly BreadcrumbItem[] }) {
   return (
     <section className="page-hero">
-      <img src={image} alt="" fetchPriority="high" />
+      <picture className="page-hero-media">
+        {mobileImage ? <source media="(max-width: 700px)" srcSet={mobileImage} /> : null}
+        <img src={image} alt="" fetchPriority="high" />
+      </picture>
       <div className="image-overlay" />
-      <div className="page-hero-copy page-shell"><p className="eyebrow">{eyebrow}</p><h1>{title}</h1><p>{summary}</p><a className="button primary" href={href}>{cta}</a></div>
+      <div className="page-hero-copy page-shell"><Breadcrumbs items={breadcrumbs} /><p className="eyebrow">{eyebrow}</p><h1>{title}</h1><p>{summary}</p><a className="button primary" href={href} onClick={() => trackEvent("cta_click", { cta_location: "page_hero", cta_label: cta })}>{cta}</a></div>
     </section>
   );
 }
@@ -241,7 +274,7 @@ function FlagshipGrid() {
   return (
     <div className="flagship-grid">
       {flagshipOffers.map((offer) => (
-        <Reveal className="flagship-card" key={offer.title}><a href={offer.href}><img src={offer.image} alt="" loading="lazy" /><div className="image-overlay" /><div className="flagship-copy"><span>{offer.tag}</span><h3>{offer.title}</h3><p>{offer.body}</p><b>Conhecer oferta</b></div></a></Reveal>
+        <Reveal className="flagship-card" key={offer.title}><a href={offer.href} onClick={() => trackEvent("service_view", { service_name: offer.title, cta_location: "flagship_card" })}><img src={offer.image} alt="" loading="lazy" /><div className="image-overlay" /><div className="flagship-copy"><span>{offer.tag}</span><h3>{offer.title}</h3><p>{offer.body}</p><b>Conhecer oferta</b></div></a></Reveal>
       ))}
     </div>
   );
@@ -250,7 +283,11 @@ function FlagshipGrid() {
 function VisualCarousel() {
   const [active, setActive] = useState(0);
   const story = visualStories[active];
-  const change = (direction: number) => setActive((current) => (current + direction + visualStories.length) % visualStories.length);
+  const selectStory = (index: number, interaction: "seta" | "miniatura") => {
+    setActive(index);
+    trackEvent("carousel_select", { carousel_item: visualStories[index].label, interaction });
+  };
+  const change = (direction: number) => selectStory((active + direction + visualStories.length) % visualStories.length, "seta");
 
   return (
     <section className="visual-chapter section-dark" aria-labelledby="visual-chapter-title">
@@ -268,7 +305,7 @@ function VisualCarousel() {
               <p className="eyebrow">{story.label}</p>
               <h3>{story.title}</h3>
               <p>{story.body}</p>
-              <a className="button ghost" href={story.href}>{story.cta}</a>
+              <a className="button ghost" href={story.href} onClick={() => trackEvent("service_view", { service_name: story.label, cta_location: "visual_carousel" })}>{story.cta}</a>
             </div>
             <div className="visual-carousel-controls">
               <button type="button" onClick={() => change(-1)} aria-label="Imagem anterior"><span aria-hidden="true">←</span></button>
@@ -276,7 +313,7 @@ function VisualCarousel() {
             </div>
           </div>
           <div className="visual-carousel-thumbs" role="group" aria-label="Selecionar imagem">
-            {visualStories.map((item, index) => <button className={index === active ? "active" : ""} type="button" key={item.image} onClick={() => setActive(index)} aria-label={`Mostrar ${item.label}`} aria-current={index === active ? "true" : undefined}><img src={item.image} alt="" loading="lazy" /><span>{String(index + 1).padStart(2, "0")}</span></button>)}
+            {visualStories.map((item, index) => <button className={index === active ? "active" : ""} type="button" key={item.image} onClick={() => selectStory(index, "miniatura")} aria-label={`Mostrar ${item.label}`} aria-current={index === active ? "true" : undefined}><img src={item.image} alt="" loading="lazy" /><span>{String(index + 1).padStart(2, "0")}</span></button>)}
           </div>
         </div>
         <p className="visual-disclaimer">Imagens de direção visual. Cases de clientes, marcas e resultados só serão identificados após comprovação e autorização de uso.</p>
@@ -318,6 +355,54 @@ function PodcastConsultingFeature() {
   );
 }
 
+function IntentRouter() {
+  return (
+    <section id="objetivos" className="intent-router section-light" aria-labelledby="intent-title">
+      <div className="page-shell">
+        <Reveal className="section-heading compact"><div><p className="eyebrow">Comece pelo objetivo</p><h2 id="intent-title">O que precisa acontecer agora?</h2></div><p>Escolha o desafio mais próximo. A próxima página organiza capacidade, processo e proposta sem exigir que você conheça os nomes técnicos.</p></Reveal>
+        <div className="intent-grid">
+          {intentRoutes.map((item) => (
+            <Reveal className="intent-card" key={item.number}>
+              <a href={item.href} onClick={() => trackEvent("intent_select", { intent_name: item.prompt })}>
+                <span>{item.number}</span><h3>{item.prompt}</h3><p>{item.body}</p><b>{item.destination}</b>
+              </a>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+type RelatedJourney = { label: string; title: string; body: string; href: string };
+
+function RelatedJourneys({ items, title = "Continue pela necessidade do projeto." }: { items: readonly RelatedJourney[]; title?: string }) {
+  return (
+    <section className="related-section section-dark" aria-labelledby="related-title">
+      <div className="page-shell">
+        <Reveal className="section-heading compact"><div><p className="eyebrow">Próximos caminhos</p><h2 id="related-title">{title}</h2></div><p>As frentes podem ser contratadas separadamente ou combinadas conforme objetivo, local, equipe, prazo e complexidade.</p></Reveal>
+        <div className="related-grid">
+          {items.map((item, index) => <Reveal className="related-card" key={item.href}><a href={item.href} onClick={() => trackEvent("related_service_click", { service_name: item.title })}><span>{String(index + 1).padStart(2, "0")} · {item.label}</span><h3>{item.title}</h3><p>{item.body}</p><b>Conhecer este caminho</b></a></Reveal>)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ComplementaryCapabilities() {
+  const capabilities = legacyServiceDetails.filter((item) => item.slug !== "consultoria-implantacao-estudios-podcast");
+  return (
+    <section className="capability-index-section section-light" aria-labelledby="capability-index-title">
+      <div className="page-shell split">
+        <Reveal><p className="eyebrow">Capacidades complementares</p><h2 id="capability-index-title">Entre a oferta principal e a operação sob medida.</h2><p className="section-intro dark">Estas frentes permanecem conectadas à arquitetura AR1. Elas ajudam a detalhar necessidades específicas sem aumentar o menu principal.</p></Reveal>
+        <div className="capability-index">
+          {capabilities.map((item, index) => <Reveal className="capability-index-row" key={item.slug}><a href={`/servicos/${item.slug}`} onClick={() => trackEvent("service_view", { service_name: item.title, cta_location: "capability_index" })}><span>{String(index + 1).padStart(2, "0")}</span><div><strong>{item.title}</strong><small>{item.eyebrow}</small></div><b aria-hidden="true">→</b></a></Reveal>)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Home() {
   usePageMeta("AR1 Studios | Capacidade de mídia, produção e Haras SOBI", "A AR1 estrutura e opera conteúdo, estúdios, transmissões e produções especiais. Conheça também o Haras SOBI, locação para grandes projetos.");
   const queryProject = new URLSearchParams(window.location.search).get("projeto") ?? "";
@@ -327,11 +412,13 @@ function Home() {
       <section className="home-hero">
         <img src="/media/event-stage.webp" alt="Estrutura de palco e produção audiovisual" fetchPriority="high" />
         <div className="image-overlay" />
-        <div className="home-hero-copy page-shell"><p className="eyebrow">Capacidade de mídia · produção · locação</p><h1>Conhecimento, estrutura e histórias <span>colocados em operação.</span></h1><p>A AR1 organiza conteúdo, estúdios, transmissões e produções especiais — com o Haras SOBI como uma de suas principais plataformas de criação.</p><div className="hero-actions"><a className="button primary" href="#contato">Solicitar proposta</a><a className="button ghost" href="/solucoes">Conhecer soluções</a></div></div>
-        <a className="hero-haras-link" href="/haras-sobi"><span>Oferta principal</span><strong>Conheça o Haras SOBI</strong><b>+20 cenários · até 4 mil pessoas</b></a>
+        <div className="home-hero-copy page-shell"><p className="eyebrow">Capacidade de mídia · produção · locação</p><h1>Conhecimento, estrutura e histórias <span>colocados em operação.</span></h1><p>A AR1 organiza conteúdo, estúdios, transmissões e produções especiais — com o Haras SOBI como uma de suas principais plataformas de criação.</p><div className="hero-actions"><a className="button primary" href="#contato" onClick={() => trackEvent("cta_click", { cta_location: "home_hero", cta_label: "Solicitar proposta" })}>Solicitar proposta</a><a className="button ghost" href="#objetivos" onClick={() => trackEvent("cta_click", { cta_location: "home_hero", cta_label: "Escolher pelo objetivo" })}>Escolher pelo objetivo</a></div></div>
+        <a className="hero-haras-link" href="/haras-sobi" onClick={() => trackEvent("service_view", { service_name: "Haras SOBI", cta_location: "home_hero" })}><span>Oferta principal</span><strong>Conheça o Haras SOBI</strong><b>+20 cenários · até 4 mil pessoas</b></a>
       </section>
 
       <section className="signal-band" aria-label="Principais capacidades"><span>Operação de conteúdo</span><span>Estúdios e consultoria</span><span>Transmissões ao vivo</span><span>Haras SOBI</span></section>
+
+      <IntentRouter />
 
       <section className="thesis section-light"><div className="page-shell split"><Reveal><p className="eyebrow">O ponto de partida</p><h2>Sua organização já tem conhecimento. O desafio é colocá-lo em circulação.</h2></Reveal><Reveal className="large-copy"><p>A AR1 combina estratégia, estrutura e produção para transformar especialistas, eventos, espaços e histórias em ativos de mídia que podem ser usados de forma consistente.</p><strong>O formato vem depois. Primeiro definimos o que a operação precisa resolver.</strong></Reveal></div></section>
 
@@ -361,14 +448,22 @@ function Home() {
 
 function SolutionsPage() {
   usePageMeta("Soluções | AR1 Studios", "Operação de conteúdo, implantação de estúdios, transmissões, filmes e produções especiais da AR1 Studios.");
-  return <><Header /><main id="conteudo"><PageHero eyebrow="Soluções AR1" title="A estrutura certa para cada estágio da sua operação de mídia." summary="A AR1 pode operar conteúdo, construir capacidade interna ou assumir projetos especiais. O desenho começa pelo problema e pela forma de uso." image="/media/edit-suite.webp" href="#familias" cta="Explorar soluções" /><section id="familias" className="page-section section-light"><div className="page-shell"><Reveal><p className="eyebrow">Arquitetura comercial</p><h2>Escolha pelo desafio, não pelo equipamento.</h2></Reveal><FamilyCards expanded /></div></section><section className="decision-section section-dark"><div className="page-shell"><Reveal><p className="eyebrow">Como decidir</p><h2>Três perguntas organizam o próximo passo.</h2></Reveal><div className="decision-grid"><article><span>01</span><h3>Você precisa de cadência?</h3><p>Operação de Conteúdo organiza especialistas, pauta, produção e entregas recorrentes.</p></article><article><span>02</span><h3>Você precisa de autonomia?</h3><p>Construir Capacidade avalia, projeta e ativa uma estrutura própria para sua organização.</p></article><article><span>03</span><h3>Você precisa realizar um marco?</h3><p>Projetos Especiais reúne transmissão, evento, filme, locação e produção sob medida.</p></article></div></div></section><section className="page-section section-light"><div className="page-shell"><Reveal><p className="eyebrow">Ofertas principais</p><h2>Produtos com identidade própria.</h2></Reveal><FlagshipGrid /></div></section><PodcastConsultingFeature /><ContactSection title="Vamos identificar a solução com maior aderência." /></main><Footer /></>;
+  return <><Header /><main id="conteudo">
+    <PageHero eyebrow="Soluções AR1" title="A estrutura certa para cada estágio da sua operação de mídia." summary="A AR1 pode operar conteúdo, construir capacidade interna ou assumir projetos especiais. O desenho começa pelo problema e pela forma de uso." image="/media/edit-suite.webp" href="#familias" cta="Explorar soluções" breadcrumbs={[{ label: "Soluções" }]} />
+    <section id="familias" className="page-section section-light"><div className="page-shell"><Reveal><p className="eyebrow">Arquitetura comercial</p><h2>Escolha pelo desafio, não pelo equipamento.</h2></Reveal><FamilyCards expanded /></div></section>
+    <section className="decision-section section-dark"><div className="page-shell"><Reveal><p className="eyebrow">Como decidir</p><h2>Três perguntas organizam o próximo passo.</h2></Reveal><div className="decision-grid"><article><span>01</span><h3>Você precisa de cadência?</h3><p>Operação de Conteúdo organiza especialistas, pauta, produção e entregas recorrentes.</p></article><article><span>02</span><h3>Você precisa de autonomia?</h3><p>Construir Capacidade avalia, projeta e ativa uma estrutura própria para sua organização.</p></article><article><span>03</span><h3>Você precisa realizar um marco?</h3><p>Projetos Especiais reúne transmissão, evento, filme, locação e produção sob medida.</p></article></div></div></section>
+    <section className="page-section section-light"><div className="page-shell"><Reveal><p className="eyebrow">Ofertas principais</p><h2>Produtos com identidade própria.</h2></Reveal><FlagshipGrid /></div></section>
+    <PodcastConsultingFeature />
+    <ComplementaryCapabilities />
+    <ContactSection title="Vamos identificar a solução com maior aderência." />
+  </main><Footer /></>;
 }
 
 function ConsultingPage() {
   usePageMeta("Consultoria de podcast e estúdios | AR1 Studios", "Diagnóstico, projeto técnico, implantação, testes e treinamento para transformar um espaço de podcast em uma operação funcional.");
   return (
     <><Header /><main id="conteudo" className="consulting-page">
-      <PageHero eyebrow="Consultoria de podcast e estúdios" title="Seu estúdio precisa nascer como operação — não como uma sala cheia de equipamentos." summary="A AR1 organiza objetivo, espaço, acústica, cenografia, áudio, vídeo, iluminação, software e fluxo para que a estrutura funcione depois da inauguração." image="/media/consultoria-pos-producao.webp" href="#diagnostico" cta="Avaliar meu projeto" />
+      <PageHero eyebrow="Consultoria de podcast e estúdios" title="Seu estúdio precisa nascer como operação — não como uma sala cheia de equipamentos." summary="A AR1 organiza objetivo, espaço, acústica, cenografia, áudio, vídeo, iluminação, software e fluxo para que a estrutura funcione depois da inauguração." image="/media/consultoria-pos-producao.webp" href="#diagnostico" cta="Avaliar meu projeto" breadcrumbs={[{ label: "Soluções", href: "/solucoes" }, { label: "Consultoria de podcast" }]} />
 
       <section id="diagnostico" className="consulting-intro section-light"><div className="page-shell split"><Reveal><p className="eyebrow">Decisão antes da compra</p><h2>O investimento certo começa pelo uso.</h2></Reveal><Reveal className="large-copy"><p>Quem vai gravar? Com que frequência? Para quais formatos? Quem opera, edita, publica e mantém? Essas respostas definem o projeto antes da lista de equipamentos.</p><strong>Um estúdio funcional conecta estrutura, pessoas e rotina.</strong></Reveal></div></section>
 
@@ -383,6 +478,7 @@ function ConsultingPage() {
       <section className="consulting-decisions section-dark"><div className="page-shell"><Reveal><p className="eyebrow">Três decisões críticas</p><h2>O projeto deve caber na rotina.</h2></Reveal><div className="consulting-decision-grid">{podcastConsulting.decisions.map(([title, body], index) => <article key={title}><span>{String(index + 1).padStart(2, "0")}</span><h3>{title}</h3><p>{body}</p></article>)}</div></div></section>
 
       <section className="consulting-faq section-light"><div className="page-shell split"><Reveal><p className="eyebrow">Perguntas sobre a consultoria</p><h2>Antes do diagnóstico.</h2></Reveal><div className="faq-list">{podcastConsulting.faq.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div></div></section>
+      <RelatedJourneys items={relatedJourneys.consulting} title="Depois do estúdio, a operação precisa ganhar uso." />
       <ContactSection defaultProject="Consultoria e implantação de estúdio de podcast" title="Vamos avaliar seu estúdio antes de definir a estrutura." />
     </main><Footer /></>
   );
@@ -390,29 +486,34 @@ function ConsultingPage() {
 
 function MethodPage() {
   usePageMeta("Método | AR1 Studios", "Conheça o método da AR1 Studios para diagnosticar, desenhar, produzir e evoluir operações de mídia e projetos especiais.");
-  return <><Header /><main id="conteudo"><PageHero eyebrow="Método AR1" title="Produção séria começa antes da gravação." summary="O método organiza objetivo, pessoas, estrutura, responsabilidade e uso. Assim, cada escolha técnica serve ao resultado do projeto." image="/media/camera-auction.webp" href="#etapas" cta="Conhecer as etapas" /><section id="etapas" className="page-section section-light"><div className="page-shell"><Reveal><p className="eyebrow">Do diagnóstico à evolução</p><h2>Quatro etapas. Nenhum atalho invisível.</h2></Reveal><div className="method-grid">{methodSteps.map((step) => <Reveal className="method-card" key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.body}</p></Reveal>)}</div></div></section><section className="principles-section section-dark"><div className="page-shell split"><Reveal><p className="eyebrow">Princípios de decisão</p><h2>O que orienta cada projeto.</h2></Reveal><div className="principle-list">{principles.map(([title, body], index) => <Reveal className="principle-row" key={title}><span>{String(index + 1).padStart(2, "0")}</span><div><h3>{title}</h3><p>{body}</p></div></Reveal>)}</div></div></section><section className="proof-process section-light"><div className="page-shell split"><Reveal><p className="eyebrow">Governança de prova</p><h2>O que pode ser publicado precisa ser sustentado.</h2></Reveal><Reveal className="large-copy"><p>A AR1 separa capacidade comprovada, material autorizado, piloto em validação e hipótese. Isso evita que referência visual pareça portfólio e que proposta futura pareça resultado passado.</p><strong>Clareza comercial também é parte da entrega.</strong></Reveal></div></section><ContactSection title="Vamos avaliar se existe aderência." /></main><Footer /></>;
+  return <><Header /><main id="conteudo"><PageHero eyebrow="Método AR1" title="Produção séria começa antes da gravação." summary="O método organiza objetivo, pessoas, estrutura, responsabilidade e uso. Assim, cada escolha técnica serve ao resultado do projeto." image="/media/camera-auction.webp" href="#etapas" cta="Conhecer as etapas" breadcrumbs={[{ label: "Método" }]} /><section id="etapas" className="page-section section-light"><div className="page-shell"><Reveal><p className="eyebrow">Do diagnóstico à evolução</p><h2>Quatro etapas. Nenhum atalho invisível.</h2></Reveal><div className="method-grid">{methodSteps.map((step) => <Reveal className="method-card" key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.body}</p></Reveal>)}</div></div></section><section className="principles-section section-dark"><div className="page-shell split"><Reveal><p className="eyebrow">Princípios de decisão</p><h2>O que orienta cada projeto.</h2></Reveal><div className="principle-list">{principles.map(([title, body], index) => <Reveal className="principle-row" key={title}><span>{String(index + 1).padStart(2, "0")}</span><div><h3>{title}</h3><p>{body}</p></div></Reveal>)}</div></div></section><section className="proof-process section-light"><div className="page-shell split"><Reveal><p className="eyebrow">Governança de prova</p><h2>O que pode ser publicado precisa ser sustentado.</h2></Reveal><Reveal className="large-copy"><p>A AR1 separa capacidade comprovada, material autorizado, piloto em validação e hipótese. Isso evita que referência visual pareça portfólio e que proposta futura pareça resultado passado.</p><strong>Clareza comercial também é parte da entrega.</strong></Reveal></div></section><RelatedJourneys items={relatedJourneys.method} /><ContactSection title="Vamos avaliar se existe aderência." /></main><Footer /></>;
 }
 
 function AboutPage() {
   usePageMeta("Sobre | AR1 Studios", "A AR1 Studios conecta estratégia, produção audiovisual, transmissões, estúdios e locação para organizações e projetos especiais.");
-  return <><Header /><main id="conteudo"><PageHero eyebrow="Sobre a AR1" title="O primeiro sinal de uma operação que precisa ganhar forma." summary="A AR1 conecta visão estratégica, produção audiovisual e estrutura para transformar conhecimento, espaços e histórias em presença organizada." image="/media/cattle-rays.webp" /><section className="page-section section-light"><div className="page-shell split"><Reveal><p className="eyebrow">Nossa direção</p><h2>Do campo para uma atuação multissetorial.</h2></Reveal><Reveal className="large-copy"><p>A experiência no agronegócio formou repertório para lidar com território, evento, transmissão, relacionamento e histórias de patrimônio. Essa força não limita a AR1: ela sustenta uma atuação com empresas B2B, instituições, marcas e projetos culturais.</p><p>A empresa avança para um modelo que une produção, consultoria e capacidade de mídia, sempre com ofertas e responsabilidades claramente definidas.</p></Reveal></div></section><section className="about-visual section-dark"><div className="page-shell media-split reverse"><img src="/media/event-stage.webp" alt="Estrutura de palco e produção" loading="lazy" /><Reveal><p className="eyebrow">Uma marca, várias capacidades</p><h2>Estratégia, estrutura e execução sob a mesma direção.</h2><p>A AR1 não cria uma submarca para cada serviço. Operação de conteúdo, estúdios, transmissões, filmes e Haras SOBI pertencem à mesma proposta de valor: fazer a mídia funcionar dentro de um objetivo real.</p></Reveal></div></section><section className="page-section section-light"><div className="page-shell"><Reveal><p className="eyebrow">Compromissos</p><h2>Como queremos trabalhar.</h2></Reveal><div className="commitment-grid"><article><span>01</span><h3>Escopo claro</h3><p>Entregas, responsabilidades e limites definidos antes da execução.</p></article><article><span>02</span><h3>Estrutura adequada</h3><p>Recursos dimensionados pela necessidade, e não pela aparência.</p></article><article><span>03</span><h3>Presença que permanece</h3><p>Conteúdo organizado para continuar útil depois do momento de produção.</p></article></div></div></section><ContactSection /></main><Footer /></>;
+  return <><Header /><main id="conteudo"><PageHero eyebrow="Sobre a AR1" title="O primeiro sinal de uma operação que precisa ganhar forma." summary="A AR1 conecta visão estratégica, produção audiovisual e estrutura para transformar conhecimento, espaços e histórias em presença organizada." image="/media/cattle-rays.webp" breadcrumbs={[{ label: "Sobre" }]} /><section className="page-section section-light"><div className="page-shell split"><Reveal><p className="eyebrow">Nossa direção</p><h2>Do campo para uma atuação multissetorial.</h2></Reveal><Reveal className="large-copy"><p>A experiência no agronegócio formou repertório para lidar com território, evento, transmissão, relacionamento e histórias de patrimônio. Essa força não limita a AR1: ela sustenta uma atuação com empresas B2B, instituições, marcas e projetos culturais.</p><p>A empresa avança para um modelo que une produção, consultoria e capacidade de mídia, sempre com ofertas e responsabilidades claramente definidas.</p></Reveal></div></section><section className="about-visual section-dark"><div className="page-shell media-split reverse"><img src="/media/event-stage.webp" alt="Estrutura de palco e produção" loading="lazy" /><Reveal><p className="eyebrow">Uma marca, várias capacidades</p><h2>Estratégia, estrutura e execução sob a mesma direção.</h2><p>A AR1 não cria uma submarca para cada serviço. Operação de conteúdo, estúdios, transmissões, filmes e Haras SOBI pertencem à mesma proposta de valor: fazer a mídia funcionar dentro de um objetivo real.</p></Reveal></div></section><section className="page-section section-light"><div className="page-shell"><Reveal><p className="eyebrow">Compromissos</p><h2>Como queremos trabalhar.</h2></Reveal><div className="commitment-grid"><article><span>01</span><h3>Escopo claro</h3><p>Entregas, responsabilidades e limites definidos antes da execução.</p></article><article><span>02</span><h3>Estrutura adequada</h3><p>Recursos dimensionados pela necessidade, e não pela aparência.</p></article><article><span>03</span><h3>Presença que permanece</h3><p>Conteúdo organizado para continuar útil depois do momento de produção.</p></article></div></div></section><RelatedJourneys items={relatedJourneys.about} /><ContactSection /></main><Footer /></>;
 }
 
 function HarasPage() {
   usePageMeta("Haras SOBI | Locação e produção AR1 Studios", "Conheça o Haras SOBI: mais de 20 cenários, pista para shows e gravações de DVD e espaço coberto para até 4 mil pessoas.");
   const gallery = [
-    ["/media/fields-square.webp", "Paisagens e áreas externas"],
-    ["/media/horse.webp", "Narrativas rurais e de patrimônio"],
-    ["/media/event-stage.webp", "Shows, eventos e grandes montagens"],
-    ["/media/mist-fields.webp", "Atmosferas para filmes e campanhas"],
+    { image: "/media/haras-pista-e-cavalo-2026-v1.webp", small: "/media/haras-pista-e-cavalo-2026-v1-sm.webp", label: "Pista e identidade equestre", alt: "Cavalo e cavaleiro na pista do Haras SOBI" },
+    { image: "/media/haras-show-noturno-2026-v1.webp", small: "/media/haras-show-noturno-2026-v1-sm.webp", label: "Shows e experiências ao vivo", alt: "Show noturno com palco e público no Haras SOBI" },
+    { image: "/media/haras-bosque-2026-v1.webp", small: "/media/haras-bosque-2026-v1-sm.webp", label: "Bosque e áreas de convivência", alt: "Bosque arborizado com paisagismo no Haras SOBI" },
+    { image: "/media/haras-lago-2026-v1.webp", small: "/media/haras-lago-2026-v1-sm.webp", label: "Lago e paisagens naturais", alt: "Lago cercado por árvores e áreas verdes no Haras SOBI" },
+    { image: "/media/haras-espaco-coberto-2026-v1.webp", small: "/media/haras-espaco-coberto-2026-v1-sm.webp", label: "Grande área coberta", alt: "Estrutura ampla e coberta do Haras SOBI" },
+    { image: "/media/haras-palco-externo-2026-v1.webp", small: "/media/haras-palco-externo-2026-v1-sm.webp", label: "Palcos e ativações", alt: "Apresentação musical em palco externo no Haras SOBI" },
+    { image: "/media/haras-salao-eventos-2026-v1.webp", small: "/media/haras-salao-eventos-2026-v1-sm.webp", label: "Salão para recepção e eventos", alt: "Salão coberto preparado com mesas no Haras SOBI" },
+    { image: "/media/haras-lounge-coberto-2026-v1.webp", small: "/media/haras-lounge-coberto-2026-v1-sm.webp", label: "Ambientes cobertos e cenografia", alt: "Ambiente coberto com mobiliário de madeira no Haras SOBI" },
   ];
   return (
     <><Header /><main id="conteudo">
-      <PageHero eyebrow="Haras SOBI · oferta principal AR1" title="Um território inteiro para colocar grandes ideias em cena." summary="Um dos maiores espaços de produção de conteúdo do Brasil, com mais de 20 cenários, pista de laço para shows e DVDs e área coberta para até 4 mil pessoas." image="/media/horse.webp" cta="Consultar agenda e proposta" />
+      <PageHero eyebrow="Haras SOBI · oferta principal AR1" title="Um território inteiro para colocar grandes ideias em cena." summary="Um dos maiores espaços de produção de conteúdo do Brasil, com mais de 20 cenários, pista de laço para shows e DVDs e área coberta para até 4 mil pessoas." image="/media/haras-vista-aerea-2026-v1.webp" mobileImage="/media/haras-vista-aerea-2026-v1-mobile.webp" cta="Consultar agenda e proposta" breadcrumbs={[{ label: "Soluções", href: "/solucoes" }, { label: "Haras SOBI" }]} />
       <section className="haras-numbers section-light"><div className="page-shell"><Reveal><p className="eyebrow">Escala real</p><h2>Mais possibilidades. Menos deslocamentos.</h2></Reveal><div className="fact-grid light">{harasFacts.map((fact) => <Reveal className="fact-card" key={fact.value}><strong>{fact.value}</strong><span>{fact.label}</span></Reveal>)}</div></div></section>
-      <section className="haras-gallery-section section-dark"><div className="page-shell"><Reveal className="section-heading compact"><div><p className="eyebrow">Uma locação, muitas linguagens</p><h2>Do íntimo ao monumental.</h2></div><p>O desenho do projeto define áreas, circulação, montagem, equipe, captação e operação. A disponibilidade é confirmada conforme agenda e avaliação técnica.</p></Reveal><div className="venue-gallery">{gallery.map(([image, label], index) => <Reveal className={`venue-shot shot-${index + 1}`} key={label}><img src={image} alt={label} loading="lazy" /><span>{String(index + 1).padStart(2, "0")} · {label}</span></Reveal>)}</div></div></section>
+      <section className="haras-gallery-section section-dark"><div className="page-shell"><Reveal className="section-heading compact"><div><p className="eyebrow">Uma locação, muitas linguagens</p><h2>Do íntimo ao monumental.</h2></div><p>Fotografias reais do Haras SOBI. O desenho do projeto define áreas, circulação, montagem, equipe, captação e operação. A disponibilidade é confirmada conforme agenda e avaliação técnica.</p></Reveal><div className="venue-gallery">{gallery.map((item, index) => <Reveal className={`venue-shot shot-${index + 1}`} key={item.label}><picture><source media="(max-width: 700px)" srcSet={item.small} /><img src={item.image} alt={item.alt} loading="lazy" decoding="async" /></picture><span>{String(index + 1).padStart(2, "0")} · {item.label}</span></Reveal>)}</div></div></section>
       <section className="applications-section section-light"><div className="page-shell"><Reveal><p className="eyebrow">O que pode acontecer aqui</p><h2>Uma plataforma para produção, evento e experiência.</h2></Reveal><div className="application-grid">{harasApplications.map(([title, body], index) => <Reveal className="application-card" key={title}><span>{String(index + 1).padStart(2, "0")}</span><h3>{title}</h3><p>{body}</p></Reveal>)}</div></div></section>
       <section className="haras-operation section-dark"><div className="page-shell split"><Reveal><p className="eyebrow">Modelo de contratação</p><h2>Locação e produção podem ser pensadas juntas.</h2></Reveal><Reveal className="large-copy"><p>A proposta é construída conforme formato, público, data, áreas utilizadas, montagem, equipe, operação audiovisual e responsabilidades. Cada projeto passa por briefing e avaliação de viabilidade.</p><strong>O espaço abre possibilidades. O planejamento transforma possibilidade em execução.</strong></Reveal></div></section>
+      <RelatedJourneys items={relatedJourneys.haras} title="Conecte a locação à entrega que o projeto exige." />
       <ContactSection defaultProject="Haras SOBI" title="Vamos desenhar sua produção no Haras SOBI." />
     </main><Footer /></>
   );
@@ -446,14 +547,24 @@ function ProductPage({ type }: { type: "live" | "legacy" }) {
     storyImage: "/media/cattle-wide.webp",
   };
   usePageMeta(data.pageTitle, data.description);
-  return <><Header /><main id="conteudo"><PageHero eyebrow={data.eyebrow} title={data.title} summary={data.summary} image={data.image} /><section className="product-value section-light"><div className="page-shell"><Reveal><p className="eyebrow">O que organiza</p><h2>Uma entrega pensada como ativo.</h2></Reveal><div className="value-grid">{data.points.map((point, index) => <Reveal className="value-card" key={point}><span>{String(index + 1).padStart(2, "0")}</span><p>{point}</p></Reveal>)}</div></div></section><section className="product-story section-dark"><div className="page-shell media-split"><img src={data.storyImage} alt="Produção AR1 Studios" loading="lazy" /><Reveal><p className="eyebrow">Visão do projeto</p><h2>{data.storyTitle}</h2><p>{data.story}</p></Reveal></div></section><ContactSection defaultProject={data.project} /></main><Footer /></>;
+  return <><Header /><main id="conteudo"><PageHero eyebrow={data.eyebrow} title={data.title} summary={data.summary} image={data.image} breadcrumbs={[{ label: "Soluções", href: "/solucoes" }, { label: data.eyebrow }]} /><section className="product-value section-light"><div className="page-shell"><Reveal><p className="eyebrow">O que organiza</p><h2>Uma entrega pensada como ativo.</h2></Reveal><div className="value-grid">{data.points.map((point, index) => <Reveal className="value-card" key={point}><span>{String(index + 1).padStart(2, "0")}</span><p>{point}</p></Reveal>)}</div></div></section><section className="product-story section-dark"><div className="page-shell media-split"><img src={data.storyImage} alt="Produção AR1 Studios" loading="lazy" /><Reveal><p className="eyebrow">Visão do projeto</p><h2>{data.storyTitle}</h2><p>{data.story}</p></Reveal></div></section><RelatedJourneys items={live ? relatedJourneys.live : relatedJourneys.legacy} /><ContactSection defaultProject={data.project} /></main><Footer /></>;
 }
 
 function LegacyServicePage({ slug }: { slug: string }) {
   const data = legacyServiceDetails.find((service) => service.slug === slug);
   usePageMeta(data ? `${data.title} | AR1 Studios` : "Página não encontrada | AR1 Studios", data?.summary ?? "Este endereço não corresponde a uma página da AR1 Studios.");
   if (!data) return <NotFound />;
-  return <><Header /><main id="conteudo"><PageHero eyebrow={data.eyebrow} title={data.title} summary={data.summary} image={data.image} /><section className="legacy-capability section-light"><div className="page-shell split"><Reveal><p className="eyebrow">Capacidade integrada</p><h2>Esta frente agora faz parte da nova arquitetura AR1.</h2><p className="section-intro dark">A solução é combinada com estratégia, estrutura e produção conforme o contexto.</p><a className="text-link" href="/solucoes">Ver arquitetura de soluções</a></Reveal><div className="capability-list">{data.items.map((item, index) => <Reveal className="capability-row" key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></Reveal>)}</div></div></section><ContactSection defaultProject={data.project} /></main><Footer /></>;
+  const related = [
+    { label: "Visão completa", title: "Soluções AR1", body: "Entenda como esta capacidade se combina com operação de conteúdo, estrutura e projetos especiais.", href: "/solucoes" },
+    { label: "Como executamos", title: "Método AR1", body: "Veja como objetivo, responsabilidades, estrutura e uso orientam cada projeto.", href: "/metodo" },
+    { label: "Projeto de escala", title: "Haras SOBI", body: "Conheça uma das principais plataformas da AR1 para gravações, eventos e experiências.", href: "/haras-sobi" },
+  ] as const;
+  return <><Header /><main id="conteudo"><PageHero eyebrow={data.eyebrow} title={data.title} summary={data.summary} image={data.image} breadcrumbs={[{ label: "Soluções", href: "/solucoes" }, { label: data.title }]} /><section className="legacy-capability section-light"><div className="page-shell split"><Reveal><p className="eyebrow">Capacidade integrada</p><h2>Esta frente faz parte da arquitetura AR1.</h2><p className="section-intro dark">A solução é combinada com estratégia, estrutura e produção conforme o contexto.</p><a className="text-link" href="/solucoes">Ver arquitetura de soluções</a></Reveal><div className="capability-list">{data.items.map((item, index) => <Reveal className="capability-row" key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></Reveal>)}</div></div></section><RelatedJourneys items={related} /><ContactSection defaultProject={data.project} /></main><Footer /></>;
+}
+
+function RedirectPage({ to }: { to: string }) {
+  useEffect(() => { window.location.replace(to); }, [to]);
+  return <><Header /><main id="conteudo" className="not-found section-dark"><div className="page-shell"><p className="eyebrow">Redirecionando</p><h1>Este conteúdo ganhou uma página mais completa.</h1><p>Você será levado ao endereço atualizado.</p><a className="button primary" href={to}>Continuar</a></div></main><Footer /></>;
 }
 
 function NotFound() {
@@ -487,6 +598,7 @@ function App() {
   if (path === "/haras-sobi") return <HarasPage />;
   if (path === "/leilao-360") return <ProductPage type="live" />;
   if (path === "/filme-de-legado") return <ProductPage type="legacy" />;
+  if (path === "/servicos/consultoria-implantacao-estudios-podcast") return <RedirectPage to="/consultoria-podcast" />;
   if (path.startsWith("/servicos/")) return <LegacyServicePage slug={path.slice("/servicos/".length)} />;
   return <NotFound />;
 }
