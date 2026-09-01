@@ -122,6 +122,7 @@ function Header() {
       <button ref={menuButtonRef} className="menu-button" onClick={() => setOpen(!open)} aria-controls="main-navigation" aria-expanded={open} aria-label={open ? "Fechar menu" : "Abrir menu"}><span aria-hidden="true" /><span aria-hidden="true" /></button>
       {open && <button className="menu-backdrop" type="button" tabIndex={-1} aria-label="Fechar menu" onClick={() => setOpen(false)} />}
       <nav ref={navRef} id="main-navigation" className={open ? "nav open" : "nav"} aria-label="Navegação principal">
+        <a href="/" aria-current={current("/")} onClick={() => setOpen(false)}>Home</a>
         <a href="/solucoes" aria-current={current("/solucoes")} onClick={() => setOpen(false)}>Soluções</a>
         <a href="/consultoria-podcast" aria-current={current("/consultoria-podcast")} onClick={() => setOpen(false)}>Consultoria</a>
         <a href="/haras-sobi" aria-current={current("/haras-sobi")} onClick={() => setOpen(false)}>Haras SOBI</a>
