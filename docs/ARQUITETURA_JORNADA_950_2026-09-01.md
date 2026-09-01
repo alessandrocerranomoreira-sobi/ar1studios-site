@@ -31,6 +31,12 @@ Transformar o site em uma jornada comercial orientada por necessidade, mantendo 
 - fotos reais também substituíram referências genéricas nos destaques do Haras, na Home e em produção externa;
 - os arquivos originais permanecem preservados fora da pasta pública do site.
 
+## Fachada AR1 Studios
+
+- a fachada fornecida foi convertida para WebP em uma versão de 1600 px e outra vertical para celular;
+- ela agora é a imagem principal da Home, para apresentar a marca e seu território já no primeiro contato;
+- a hero preserva contraste para leitura e usa o enquadramento vertical correto em telas menores.
+
 ## Eventos preparados
 
 - `page_view`;

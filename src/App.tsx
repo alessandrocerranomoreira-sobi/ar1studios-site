@@ -410,7 +410,10 @@ function Home() {
   return (
     <><Header /><main id="conteudo">
       <section className="home-hero">
-        <img src="/media/event-stage.webp" alt="Estrutura de palco e produção audiovisual" fetchPriority="high" />
+        <picture className="home-hero-media">
+          <source media="(max-width: 700px)" srcSet="/media/ar1-fachada-2026-v1-mobile.webp" />
+          <img src="/media/ar1-fachada-2026-v1.webp" alt="Fachada iluminada da AR1 Studios" fetchPriority="high" />
+        </picture>
         <div className="image-overlay" />
         <div className="home-hero-copy page-shell"><p className="eyebrow">Capacidade de mídia · produção · locação</p><h1>Conhecimento, estrutura e histórias <span>colocados em operação.</span></h1><p>A AR1 organiza conteúdo, estúdios, transmissões e produções especiais — com o Haras SOBI como uma de suas principais plataformas de criação.</p><div className="hero-actions"><a className="button primary" href="#contato" onClick={() => trackEvent("cta_click", { cta_location: "home_hero", cta_label: "Solicitar proposta" })}>Solicitar proposta</a><a className="button ghost" href="#objetivos" onClick={() => trackEvent("cta_click", { cta_location: "home_hero", cta_label: "Escolher pelo objetivo" })}>Escolher pelo objetivo</a></div></div>
         <a className="hero-haras-link" href="/haras-sobi" onClick={() => trackEvent("service_view", { service_name: "Haras SOBI", cta_location: "home_hero" })}><span>Oferta principal</span><strong>Conheça o Haras SOBI</strong><b>+20 cenários · até 4 mil pessoas</b></a>
