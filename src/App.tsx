@@ -193,7 +193,24 @@ function WhatsAppFloat({ interest }: { interest: string }) {
 }
 
 function Reveal({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`reveal ${className}`}>{children}</div>;
+  const element = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const node = element.current;
+    if (!node) return;
+    if (!("IntersectionObserver" in window)) {
+      node.classList.add("visible");
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        node.classList.add("visible");
+        observer.disconnect();
+      }
+    }, { threshold: 0.08, rootMargin: "0px 0px -24px" });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  return <div ref={element} className={`reveal ${className}`}>{children}</div>;
 }
 
 function ContactForm({ defaultProject = "" }: { defaultProject?: string }) {
@@ -320,7 +337,7 @@ function VisualCarousel() {
           <p>Uma leitura visual das frentes que a AR1 organiza — da produção em campo à implantação de estúdios.</p>
         </Reveal>
         <div className="visual-carousel" role="region" aria-roledescription="carrossel" aria-label="Capacidades visuais da AR1 Studios">
-          <div className="visual-carousel-stage">
+          <div id="visual-story-panel" className="visual-carousel-stage" role="tabpanel" tabIndex={0} aria-label={story.label}>
             {visualStories.map((item, index) => <img className={index === active ? "active" : ""} key={item.image} src={item.image} alt={index === active ? item.alt : ""} loading={index === 0 ? "eager" : "lazy"} aria-hidden={index !== active} />)}
             <div className="visual-carousel-scrim" />
             <div className="visual-carousel-copy" aria-live="polite">
@@ -335,8 +352,16 @@ function VisualCarousel() {
               <button type="button" onClick={() => change(1)} aria-label="Próxima imagem"><span aria-hidden="true">→</span></button>
             </div>
           </div>
-          <div className="visual-carousel-thumbs" role="group" aria-label="Selecionar imagem">
-            {visualStories.map((item, index) => <button className={index === active ? "active" : ""} type="button" key={item.image} onClick={() => selectStory(index, "miniatura")} aria-label={`Mostrar ${item.label}`} aria-current={index === active ? "true" : undefined}><img src={item.image} alt="" loading="lazy" /><span>{String(index + 1).padStart(2, "0")}</span></button>)}
+          <div className="visual-carousel-nav">
+            <div className="visual-carousel-nav-copy"><span>Explore as frentes</span><p>Selecione uma cena para ver a imagem e conhecer os detalhes.</p></div>
+            <div className="visual-carousel-thumbs" role="tablist" aria-label="Selecionar uma frente da AR1 Studios">
+              {visualStories.map((item, index) => (
+                <button className={index === active ? "active" : ""} type="button" role="tab" key={item.image} onClick={() => selectStory(index, "miniatura")} aria-label={`Ver detalhes de ${item.label}`} aria-selected={index === active} aria-controls="visual-story-panel">
+                  <span className="visual-thumb-media"><img src={item.image} alt="" loading="lazy" /><b>{String(index + 1).padStart(2, "0")}</b></span>
+                  <span className="visual-thumb-copy"><strong>{item.label}</strong><small>{index === active ? "Em exibição" : "Ver detalhes"}</small></span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
         <p className="visual-disclaimer">Imagens de direção visual. Cases de clientes, marcas e resultados só serão identificados após comprovação e autorização de uso.</p>
@@ -346,9 +371,7 @@ function VisualCarousel() {
 }
 
 function Showreel() {
-  const [fallback, setFallback] = useState(false);
-  if (fallback) return <VisualCarousel />;
-  return <section className="visual-chapter section-dark"><div className="page-shell"><Reveal className="section-heading compact"><div><p className="eyebrow">O que já colocamos em cena</p><h2>Veja em 60 segundos.</h2></div><p>Shows, leilões, estúdios e filmes que produzimos. Tudo aqui é trabalho realizado, com autorização dos clientes.</p></Reveal><video className="showreel" autoPlay muted loop playsInline controls poster="/images/showreel-poster.jpg" onError={() => setFallback(true)}><source src="/videos/showreel-60.mp4" type="video/mp4" /></video></div></section>;
+  return <VisualCarousel />;
 }
 
 function ProofStrip() {
@@ -461,6 +484,10 @@ function Home() {
       <Showreel />
 
       <section className="haras-feature section-dark">
+        <picture className="haras-feature-media" aria-hidden="true">
+          <source media="(max-width: 700px)" srcSet="/media/haras-vista-aerea-2026-v1-mobile.webp" />
+          <img src="/media/haras-vista-aerea-2026-v1.webp" alt="" loading="lazy" decoding="async" />
+        </picture>
         <div className="page-shell"><div className="section-heading"><Reveal><p className="eyebrow">Haras SOBI · GO-010, sentido Nerópolis</p><h2>Um dos maiores espaços de produção de conteúdo do Brasil fica na saída de Goiânia.</h2></Reveal><Reveal><p>Mais de 20 cenários — pista de laço, bosque, lago, palcos, salão e grande área coberta — em um só endereço. Você chega com a ideia e sai com o projeto gravado.</p><a className="button primary" href="/haras-sobi">Explorar o Haras SOBI</a></Reveal></div><div className="fact-grid">{harasFacts.map((fact) => <Reveal className="fact-card" key={fact.value}><strong>{fact.value}</strong><span>{fact.label}</span></Reveal>)}</div></div>
       </section>
 
@@ -624,21 +651,6 @@ function NotFound() {
 function App() {
   const path = window.location.pathname.replace(/\/+$/, "") || "/";
   useAnalyticsAndSchema();
-  useEffect(() => {
-    const elements = document.querySelectorAll(".reveal");
-    if (!("IntersectionObserver" in window)) {
-      elements.forEach((element) => element.classList.add("visible"));
-      return;
-    }
-    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-        observer.unobserve(entry.target);
-      }
-    }), { threshold: 0.08, rootMargin: "0px 0px -24px" });
-    elements.forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
-  }, [path]);
 
   let page: ReactNode = <NotFound />;
   if (path === "/") page = <Home />;
